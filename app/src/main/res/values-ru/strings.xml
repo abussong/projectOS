@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">remindmind</string>
+    <string name="app_title">remindmind</string>
+    <string name="permission_warning">Без разрешения на отправку уведомлений вы не будете получать напоминания!</string>
+    <string name="form_title">Создать задачу</string>
+    <string name="form_text_hint">Введите текст задачи</string>
+    <string name="form_date_hint">Выберите дату</string>
+    <string name="form_time_hint">Выберите время</string>
+    <string name="form_create">Создать</string>
+    <string name="toast_datetime_error">Выберите дату или время!</string>
+    <string name="toast_text_error">Введите текст задачи!</string>
+    <string name="toast_task_created">Новая задача добавлена!</string>
+    <string name="toast_task_removed">Задача была удалена!</string>
+    <string name="new_task">Новое напоминание!</string>
+</resources>
