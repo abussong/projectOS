@@ -54,7 +54,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
             ) {
             Icon(
-                painter = painterResource(id = R.drawable.icon3), //
+                painter = painterResource(id = R.drawable.ic_launcher), //
                 contentDescription = "Добавить",
                 tint = null
             )
