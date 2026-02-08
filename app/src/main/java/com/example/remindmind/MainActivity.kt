@@ -1,17 +1,24 @@
 package com.example.remindmind
 
 import android.os.Bundle
+import androidx.compose.ui.Alignment
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.remindmind.ui.theme.RemindmindTheme
+import androidx.compose.ui.res.painterResource
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +28,7 @@ class MainActivity : ComponentActivity() {
             RemindmindTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "Remindmind",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -32,10 +39,27 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Text(text = name, color = Color.Green)
+
+
+        FloatingActionButton(
+            onClick = { /* обработчик клика */ },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+
+            ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_launcher), //
+                contentDescription = "Добавить",
+                tint = null
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)
