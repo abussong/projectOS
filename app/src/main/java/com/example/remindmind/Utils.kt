@@ -23,30 +23,36 @@ class Utils {
         }
 
         fun addZero(count: Int): String {
-            return if(count < 10) "0$count" else count.toString()
+            return if (count < 10) "0$count" else count.toString()
         }
+
         fun getCurrentDate(): String {
             val currentDate = Date()
             val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             return formatter.format(currentDate)
         }
-//fun getCurrentDate(): String {
+
+        //fun getCurrentDate(): String {
 //    val currentDate = LocalDate.now()
 //    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-    //   return currentDate.format(formatter)
-}
+        //   return currentDate.format(formatter)
+//}
         fun isReminderInPast(date: String, time: String): Boolean {
             val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
             val reminderDateTime = LocalDateTime.parse("$date $time", formatter)
             val now = LocalDateTime.now(ZoneId.systemDefault())
             return reminderDateTime.isBefore(now)
         }
+
         fun getPendingIntent(context: Context, id: Int, text: String): PendingIntent {
             val intent = Intent(context, ReminderBroadcastReceiver::class.java).apply {
                 putExtra("text", text)
                 putExtra("id", id)
             }
-            return PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT
-                    or PendingIntent.FLAG_IMMUTABLE)
+            return PendingIntent.getBroadcast(
+                context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                        or PendingIntent.FLAG_IMMUTABLE
+            )
         }
     }
+}

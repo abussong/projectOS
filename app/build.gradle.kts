@@ -39,9 +39,10 @@ android {
 
 dependencies {
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.9")
-    implementation("com.google.accompanist-systemuicontroller:0.28.0")
+    //implementation("com.google.accompanist-systemuicontroller:0.28.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose-android:2.10.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
