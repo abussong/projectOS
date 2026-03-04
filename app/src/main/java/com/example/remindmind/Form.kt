@@ -185,7 +185,7 @@ fun DateInputField(viewModel: RemindersViewModel) {
 
     Box {
         TextField(
-            value = viewModel.date,
+            value = viewModel.date.ifEmpty { "" }, // Пусто или значение
             onValueChange = { viewModel.date = it },
             modifier = Modifier
                 .fillMaxWidth()
@@ -194,18 +194,20 @@ fun DateInputField(viewModel: RemindersViewModel) {
                 focusedContainerColor = colorResource(id = R.color.navy),
                 unfocusedContainerColor = colorResource(id = R.color.navy),
                 disabledContainerColor = colorResource(id = R.color.navy),
+                focusedTextColor = colorResource(id = R.color.teal_200),
+                unfocusedTextColor = colorResource(id = R.color.teal_200),
                 disabledTextColor = colorResource(id = R.color.teal_200)
             ),
             enabled = false,
-            readOnly = true
+            readOnly = true,
+            placeholder = {
+                Text(
+                    text = stringResource(id = R.string.form_date_hint),
+                    color = colorResource(id = R.color.teal_200)
+                )
+            }
         )
-        Text(
-            text = if (viewModel.date.isNotEmpty()) viewModel.date else stringResource(id = R.string.form_date_hint),
-            color = colorResource(id = R.color.teal_200),
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(start = 10.dp)
-        )
+
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -260,7 +262,7 @@ fun TimeInputField(viewModel: RemindersViewModel) {
 
     Box {
         TextField(
-            value = viewModel.time,
+            value = "", 
             onValueChange = { viewModel.time = it },
             modifier = Modifier
                 .fillMaxWidth()
@@ -269,13 +271,17 @@ fun TimeInputField(viewModel: RemindersViewModel) {
                 focusedContainerColor = colorResource(id = R.color.navy),
                 unfocusedContainerColor = colorResource(id = R.color.navy),
                 disabledContainerColor = colorResource(id = R.color.navy),
-                disabledTextColor = colorResource(id = R.color.teal_200)
+
+                disabledTextColor = Color.Transparent
             ),
             enabled = false,
-            readOnly = true
+            readOnly = true,
+            placeholder = {}
         )
+
         Text(
-            text = if (viewModel.time.isNotEmpty()) viewModel.time else stringResource(id = R.string.form_time_hint),
+            text = if (viewModel.time.isNotEmpty()) viewModel.time
+            else stringResource(id = R.string.form_time_hint),
             color = colorResource(id = R.color.teal_200),
             modifier = Modifier
                 .align(Alignment.CenterStart)
