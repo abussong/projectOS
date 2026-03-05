@@ -1,5 +1,5 @@
 package com.example.remindmind
-
+/*
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
