@@ -38,8 +38,11 @@ android {
 }
 
 dependencies {
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.9")
     //implementation("com.google.accompanist-systemuicontroller:0.28.0")
+    implementation("androidx.compose.material:material-icons-core:1.5.4")
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose-android:2.10.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")

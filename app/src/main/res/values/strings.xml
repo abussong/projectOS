@@ -12,4 +12,12 @@
     <string name="toast_task_created">A task has been created!</string>
     <string name="toast_task_removed">A task has been removed!</string>
     <string name="new_task">New task!</string>
+
+    //для тем
+    <string name="settings_title">Settings</string>
+    <string name="theme_settings">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_navy">Navy</string>
+    <string name="back">Back</string>
 </resources>

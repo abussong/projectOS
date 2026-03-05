@@ -31,12 +31,6 @@ class Utils {
             val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             return formatter.format(currentDate)
         }
-
-        //fun getCurrentDate(): String {
-//    val currentDate = LocalDate.now()
-//    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        //   return currentDate.format(formatter)
-//}
         fun isReminderInPast(date: String, time: String): Boolean {
             val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
             val reminderDateTime = LocalDateTime.parse("$date $time", formatter)

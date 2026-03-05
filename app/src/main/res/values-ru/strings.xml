@@ -13,4 +13,12 @@
     <string name="toast_task_created">Новая задача добавлена!</string>
     <string name="toast_task_removed">Задача была удалена!</string>
     <string name="new_task">Новое напоминание!</string>
+
+    //для тем
+    <string name="settings_title">Настройки</string>
+    <string name="theme_settings">Тема оформления</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Темная</string>
+    <string name="theme_navy">Темно-синяя</string>
+    <string name="back">Назад</string>
 </resources>

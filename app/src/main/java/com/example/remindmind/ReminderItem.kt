@@ -1,80 +1,65 @@
 package com.example.remindmind
 
-import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun ReminderItem(reminder: Reminder, viewModel: RemindersViewModel) {
+    val colors = LocalAppColors.current
     val context = LocalContext.current
-    Row(
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
-            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-            .background(colorResource(id = R.color.dark), RoundedCornerShape(25.dp))
-            .border(0.5.dp, colorResource(id = R.color.teal_200), RoundedCornerShape(25.dp))
-            .padding(start = 10.dp, end = 5.dp, top = 5.dp, bottom = 5.dp)
+            .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable {
-                Toast
-                    .makeText(context, reminder.text, Toast.LENGTH_LONG)
-                    .show()
+                viewModel.removeReminder(reminder, context)
             },
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = reminder.text,
-            style = TextStyle(color = Color.White),
-            modifier = Modifier.fillMaxWidth(0.50f),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.cardBackground
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
         )
+    ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxSize()
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = reminder.text,
+                    color = colors.text,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = "${reminder.date} ${reminder.time}",
+                    color = colors.textSecondary,
+                    fontSize = 12.sp
+                )
+            }
+
             Text(
-                text = reminder.date,
-                style = TextStyle(color = colorResource(id = R.color.teal_200)),
-                modifier = Modifier.padding(start = 7.dp)
-            )
-            Text(
-                text = reminder.time,
-                style = TextStyle(color = colorResource(id = R.color.teal_200)),
-                modifier = Modifier.padding(start = 7.dp)
-            )
-            Image(
-                painter = painterResource(id = R.drawable.ic_delete),
-                contentDescription = "Delete",
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(start = 7.dp)
-                    .clickable {
-                        viewModel.removeReminder(reminder, context)
-                    }
+                text = "✕",
+                color = colors.secondary,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(start = 8.dp)
             )
         }
     }
