@@ -11,13 +11,22 @@
     <string name="toast_text_error">Enter a task!</string>
     <string name="toast_task_created">A task has been created!</string>
     <string name="toast_task_removed">A task has been removed!</string>
+    <string name="toast_subtask_created">A subtask has been created!</string>
+    <string name="toast_subtask_removed">A subtask has been removed!</string>
     <string name="new_task">New task!</string>
-
-    //для тем
     <string name="settings_title">Settings</string>
     <string name="theme_settings">Theme</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_navy">Navy</string>
     <string name="back">Back</string>
+    <string name="subtask_title">Create Subtask</string>
+    <string name="subtask_text_hint">Enter subtask</string>
+    <string name="priority">Priority</string>
+    <string name="priority_high">High</string>
+    <string name="priority_medium">Medium</string>
+    <string name="priority_low">Low</string>
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_subtasks">No subtasks yet</string>
 </resources>

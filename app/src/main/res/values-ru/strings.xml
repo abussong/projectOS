@@ -13,7 +13,8 @@
     <string name="toast_task_created">Новая задача добавлена!</string>
     <string name="toast_task_removed">Задача была удалена!</string>
     <string name="new_task">Новое напоминание!</string>
-
+    <string name="toast_subtask_created">Подзадача создана!</string>
+    <string name="toast_subtask_removed">Подзадача удалена!</string>
     //для тем
     <string name="settings_title">Настройки</string>
     <string name="theme_settings">Тема оформления</string>
@@ -21,4 +22,14 @@
     <string name="theme_dark">Темная</string>
     <string name="theme_navy">Темно-синяя</string>
     <string name="back">Назад</string>
+
+    <string name="subtask_title">Создать подзадачу</string>
+    <string name="subtask_text_hint">Введите подзадачу</string>
+    <string name="priority">Приоритет</string>
+    <string name="priority_high">Высокий</string>
+    <string name="priority_medium">Средний</string>
+    <string name="priority_low">Низкий</string>
+    <string name="create">Создать</string>
+    <string name="cancel">Отмена</string>
+    <string name="no_subtasks">Нет подзадач</string>
 </resources>

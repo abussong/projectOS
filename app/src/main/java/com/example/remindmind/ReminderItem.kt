@@ -1,66 +1,311 @@
+//package com.example.remindmind
+//
+//import androidx.compose.foundation.clickable
+//import androidx.compose.foundation.layout.*
+//import androidx.compose.foundation.shape.RoundedCornerShape
+//import androidx.compose.material3.Card
+//import androidx.compose.material3.CardDefaults
+//import androidx.compose.material3.Text
+//import androidx.compose.runtime.Composable
+//import androidx.compose.ui.Alignment
+//import androidx.compose.ui.Modifier
+//import androidx.compose.ui.platform.LocalContext
+//import androidx.compose.ui.unit.dp
+//import androidx.compose.ui.unit.sp
+//
+//@Composable
+//fun ReminderItem(reminder: Reminder, viewModel: RemindersViewModel) {
+//    val colors = LocalAppColors.current
+//    val context = LocalContext.current
+//
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 16.dp, vertical = 4.dp)
+//            .clickable {
+//                viewModel.removeReminder(reminder, context)
+//            },
+//        shape = RoundedCornerShape(8.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = colors.cardBackground
+//        ),
+//        elevation = CardDefaults.cardElevation(
+//            defaultElevation = 2.dp
+//        )
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(12.dp),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Column(
+//                modifier = Modifier.weight(1f)
+//            ) {
+//                Text(
+//                    text = reminder.text,
+//                    color = colors.text,
+//                    fontSize = 16.sp
+//                )
+//                Text(
+//                    text = "${reminder.date} ${reminder.time}",
+//                    color = colors.textSecondary,
+//                    fontSize = 12.sp
+//                )
+//            }
+//
+//            Text(
+//                text = "✕",
+//                color = colors.secondary,
+//                fontSize = 20.sp,
+//                modifier = Modifier.padding(start = 8.dp)
+//            )
+//        }
+//    }
+//}
 package com.example.remindmind
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 @Composable
-fun ReminderItem(reminder: Reminder, viewModel: RemindersViewModel) {
+fun ReminderItem(
+    reminder: Reminder,
+    viewModel: RemindersViewModel,
+    onAddSubTask: () -> Unit
+) {
     val colors = LocalAppColors.current
     val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+    var checked by remember { mutableStateOf(reminder.isCompleted) }
+
+    // Синхронизируем состояние с моделью
+    LaunchedEffect(reminder.isCompleted) {
+        checked = reminder.isCompleted
+    }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .clickable {
-                viewModel.removeReminder(reminder, context)
-            },
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colors.cardBackground
+            containerColor = if (checked) colors.cardBackground.copy(alpha = 0.5f)
+            else colors.cardBackground
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = checked,
+                        onCheckedChange = { isChecked ->
+                            checked = isChecked
+                            viewModel.toggleReminderCompletion(reminder)
+                        },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = colors.secondary,
+                            uncheckedColor = colors.textSecondary
+                        )
+                    )
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = reminder.text,
+                            color = if (checked) colors.textSecondary else colors.text,
+                            fontSize = 16.sp,
+                            fontWeight = if (reminder.priority == Priority.HIGH) FontWeight.Bold else FontWeight.Normal
+                        )
+                        Text(
+                            text = "${reminder.date} ${reminder.time}",
+                            color = colors.textSecondary,
+                            fontSize = 12.sp
+                        )
+                        PriorityIndicator(priority = reminder.priority, colors = colors)
+                    }
+                }
+
+                Row {
+                    IconButton(
+                        onClick = onAddSubTask,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Text(text = "+", color = colors.secondary, fontSize = 20.sp)
+                    }
+
+                    IconButton(
+                        onClick = { viewModel.removeReminder(reminder, context) },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Text(text = "✕", color = colors.secondary, fontSize = 18.sp)
+                    }
+
+                    IconButton(
+                        onClick = { expanded = !expanded },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Text(
+                            text = if (expanded) "▼" else "▶",
+                            color = colors.secondary,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+
+            if (expanded) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Divider(color = colors.border)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (reminder.subTasks.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        reminder.subTasks.forEach { subTask ->
+                            SubTaskItem(
+                                subTask = subTask,
+                                reminder = reminder,
+                                viewModel = viewModel
+                            )
+                        }
+                    }
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.no_subtasks),
+                        color = colors.textSecondary,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SubTaskItem(
+    subTask: SubTask,
+    reminder: Reminder,
+    viewModel: RemindersViewModel
+) {
+    val colors = LocalAppColors.current
+    val context = LocalContext.current
+    var checked by remember { mutableStateOf(subTask.isCompleted) }
+
+    // Синхронизируем состояние с моделью
+    LaunchedEffect(subTask.isCompleted) {
+        checked = subTask.isCompleted
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Checkbox(
+                checked = checked,
+                onCheckedChange = { isChecked ->
+                    checked = isChecked
+                    viewModel.toggleSubTaskCompletion(reminder, subTask)
+                },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = colors.secondary,
+                    uncheckedColor = colors.textSecondary
+                ),
+                modifier = Modifier.size(24.dp)
+            )
+
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = reminder.text,
-                    color = colors.text,
-                    fontSize = 16.sp
+                    text = subTask.text,
+                    color = if (checked) colors.textSecondary else colors.text,
+                    fontSize = 14.sp
                 )
                 Text(
-                    text = "${reminder.date} ${reminder.time}",
+                    text = "${subTask.date} ${subTask.time}",
                     color = colors.textSecondary,
-                    fontSize = 12.sp
+                    fontSize = 10.sp
                 )
+                PriorityIndicator(priority = subTask.priority, colors = colors, small = true)
             }
-
-            Text(
-                text = "✕",
-                color = colors.secondary,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(start = 8.dp)
-            )
         }
+
+        IconButton(
+            onClick = { viewModel.removeSubTask(reminder, subTask, context) },
+            modifier = Modifier.size(28.dp)
+        ) {
+            Text(text = "✕", color = colors.secondary, fontSize = 14.sp)
+        }
+    }
+}
+
+@Composable
+fun PriorityIndicator(priority: Priority, colors: AppColors, small: Boolean = false) {
+    val color = when (priority) {
+        Priority.HIGH -> Color.Red
+        Priority.MEDIUM -> Color.Yellow
+        Priority.LOW -> Color.Green
+    }
+
+    Row(
+        modifier = Modifier.padding(top = 2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(if (small) 6.dp else 8.dp)
+                .clip(RoundedCornerShape(50))
+                .background(color)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = when (priority) {
+                Priority.HIGH -> stringResource(id = R.string.priority_high)
+                Priority.MEDIUM -> stringResource(id = R.string.priority_medium)
+                Priority.LOW -> stringResource(id = R.string.priority_low)
+            },
+            color = colors.textSecondary,
+            fontSize = if (small) 10.sp else 11.sp
+        )
     }
 }

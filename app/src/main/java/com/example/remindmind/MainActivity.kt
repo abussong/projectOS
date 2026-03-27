@@ -117,7 +117,6 @@ fun AppTitle() {
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -127,6 +126,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -134,8 +135,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -145,14 +146,12 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
-import androidx.compose.ui.graphics.toArgb
 
 class MainActivity : ComponentActivity() {
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            isGranted: Boolean -> if(!isGranted) {
-        Toast.makeText(this, R.string.permission_warning, Toast.LENGTH_LONG).show()
-    }
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        if (!isGranted) {
+            Toast.makeText(this, R.string.permission_warning, Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -162,13 +161,15 @@ class MainActivity : ComponentActivity() {
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-            && !NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+            && !NotificationManagerCompat.from(this).areNotificationsEnabled()
+        ) {
             requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-            && !alarmManager.canScheduleExactAlarms()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+            && !alarmManager.canScheduleExactAlarms()
+        ) {
             val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
             startActivity(intent)
         }
@@ -180,7 +181,6 @@ class MainActivity : ComponentActivity() {
 
             val colors = getCurrentTheme(currentTheme)
 
-            // Обновляем статус бар
             LaunchedEffect(currentTheme) {
                 window.statusBarColor = colors.statusBarColor.toArgb()
             }
@@ -191,26 +191,46 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     viewModel.dbHelper = DatabaseHelper(context)
                     viewModel.alarmManager = alarmManager
+                    viewModel.getReminders(context)
                 }
 
-                MainScreen(
+                MainScreenContent(
                     viewModel = viewModel,
                     onSettingsClick = {
                         val intent = Intent(this@MainActivity, SettingsActivity::class.java)
                         startActivity(intent)
                     }
                 )
+
+                if (viewModel.showSubTaskDialog) {
+                    SubTaskDialog(
+                        viewModel = viewModel,
+                        onDismiss = { viewModel.showSubTaskDialog = false }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun MainScreen(
+fun MainScreenContent(
     viewModel: RemindersViewModel,
     onSettingsClick: () -> Unit
 ) {
     val colors = LocalAppColors.current
+    var selectedReminder by remember { mutableStateOf<Reminder?>(null) }
+
+    // Добавляем наблюдение за изменениями в списке
+    val reminders by remember { derivedStateOf { viewModel.reminders.toList() } }
+
+    LaunchedEffect(selectedReminder) {
+        if (selectedReminder != null) {
+            viewModel.currentReminderForSubTask = selectedReminder
+            viewModel.showSubTaskDialog = true
+            selectedReminder = null
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -224,7 +244,6 @@ fun MainScreen(
                 )
             )
     ) {
-        // Верхняя панель с заголовком и кнопкой настроек
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -232,9 +251,8 @@ fun MainScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AppTitle()
+            AppTitleText()
 
-            // Кнопка настроек
             IconButton(
                 onClick = onSettingsClick,
                 modifier = Modifier
@@ -251,12 +269,29 @@ fun MainScreen(
         }
 
         Form(viewModel)
-        List(viewModel)
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(reminders) { reminder ->
+                    ReminderItem(
+                        reminder = reminder,
+                        viewModel = viewModel,
+                        onAddSubTask = { selectedReminder = reminder }
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun AppTitle() {
+fun AppTitleText() {
     val colors = LocalAppColors.current
 
     Text(
