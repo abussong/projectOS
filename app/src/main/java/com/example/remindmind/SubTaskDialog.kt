@@ -1,6 +1,7 @@
 package com.example.remindmind
 
 import android.app.DatePickerDialog
+import androidx.compose.ui.text.TextStyle
 import android.app.TimePickerDialog
 import android.widget.DatePicker
 import android.widget.TimePicker
@@ -95,7 +96,7 @@ fun SubTaskDialog(
                     onDismiss()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colors.secondary
+                    Color(0xFF03DAC5)
                 )
             ) {
                 Text(stringResource(id = R.string.create))
@@ -122,7 +123,7 @@ fun PriorityChipSubTask(
     Surface(
         modifier = Modifier.clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        color = if (isSelected) colors.secondary else colors.surface,
+        color = if (isSelected) Color(0xFF03DAC5) else colors.surface,
         border = androidx.compose.foundation.BorderStroke(1.dp, colors.border)
     ) {
         Text(
@@ -148,7 +149,9 @@ fun SubTaskDatePicker(viewModel: RemindersViewModel) {
             viewModel.subTaskDate = "${Utils.addZero(selectedDay)}.${Utils.addZero(selectedMonth + 1)}.$selectedYear"
         },
         year, month, day
-    )
+    ).apply {
+        datePicker.minDate = calendar.timeInMillis
+    }
 
     OutlinedTextField(
         value = viewModel.subTaskDate,
@@ -156,14 +159,29 @@ fun SubTaskDatePicker(viewModel: RemindersViewModel) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable { datePickerDialog.show() },
-        label = { Text(stringResource(id = R.string.form_date_hint)) },
+        label = {
+            Text(
+                text = stringResource(id = R.string.form_date_hint),
+                color = colors.boxtext //
+            )
+        },
+        placeholder = {
+            Text(
+                text = stringResource(id = R.string.form_date_hint),
+                color = colors.boxtext //
+            )
+        },
+        textStyle = TextStyle(color = colors.text),
         enabled = false,
         readOnly = true,
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = colors.secondary,
-            unfocusedTextColor = colors.secondary,
+            unfocusedTextColor = colors.text,
             focusedBorderColor = colors.secondary,
-            unfocusedBorderColor = colors.textSecondary
+            unfocusedBorderColor = colors.textSecondary,
+            focusedLabelColor = colors.secondary,
+            unfocusedLabelColor = colors.textSecondary,
+            cursorColor = colors.secondary
         )
     )
 }
@@ -175,10 +193,34 @@ fun SubTaskTimePicker(viewModel: RemindersViewModel) {
     val calendar = Calendar.getInstance()
     val hour = calendar.get(Calendar.HOUR_OF_DAY)
     val minute = calendar.get(Calendar.MINUTE)
+
     val timePickerDialog = TimePickerDialog(
         context,
         { _: TimePicker, selectedHour: Int, selectedMinute: Int ->
-            viewModel.subTaskTime = "${Utils.addZero(selectedHour)}:${Utils.addZero(selectedMinute)}"
+
+            val dateForValidation = if (viewModel.subTaskDate.isEmpty()) {
+                val today = Calendar.getInstance()
+                "${Utils.addZero(today.get(Calendar.DAY_OF_MONTH))}.${Utils.addZero(today.get(Calendar.MONTH) + 1)}.${today.get(Calendar.YEAR)}"
+            } else {
+                viewModel.subTaskDate
+            }
+
+
+            if (isSubTaskTimeValid(dateForValidation, selectedHour, selectedMinute)) {
+
+                if (viewModel.subTaskDate.isEmpty()) {
+                    val today = Calendar.getInstance()
+                    viewModel.subTaskDate = "${Utils.addZero(today.get(Calendar.DAY_OF_MONTH))}.${Utils.addZero(today.get(Calendar.MONTH) + 1)}.${today.get(Calendar.YEAR)}"
+                }
+
+                viewModel.subTaskTime = "${Utils.addZero(selectedHour)}:${Utils.addZero(selectedMinute)}"
+            } else {
+                android.widget.Toast.makeText(
+                    context,
+                    "Нельзя выбрать прошедшее время",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
         },
         hour, minute, true
     )
@@ -188,15 +230,76 @@ fun SubTaskTimePicker(viewModel: RemindersViewModel) {
         onValueChange = {},
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { timePickerDialog.show() },
-        label = { Text(stringResource(id = R.string.form_time_hint)) },
+            .clickable {
+
+                timePickerDialog.show()
+            },
+        label = {
+            Text(
+                text = stringResource(id = R.string.form_time_hint),
+                color = colors.boxtext
+            )
+        },
+        placeholder = {
+            Text(
+                text = stringResource(id = R.string.form_time_hint),
+                color = colors.boxtext
+            )
+        },
+        textStyle = TextStyle(color = colors.text),
         enabled = false,
         readOnly = true,
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = colors.secondary,
-            unfocusedTextColor = colors.secondary,
+            unfocusedTextColor = colors.text,
             focusedBorderColor = colors.secondary,
-            unfocusedBorderColor = colors.textSecondary
+            unfocusedBorderColor = colors.textSecondary,
+            focusedLabelColor = colors.secondary,
+            unfocusedLabelColor = colors.textSecondary,
+            cursorColor = colors.secondary
         )
     )
+}
+
+private fun isSubTaskTimeValid(date: String, hour: Int, minute: Int): Boolean {
+    if (date.isEmpty()) return false
+
+    if (isSubTaskToday(date)) {
+        val currentCalendar = Calendar.getInstance()
+        val currentHour = currentCalendar.get(Calendar.HOUR_OF_DAY)
+        val currentMinute = currentCalendar.get(Calendar.MINUTE)
+
+        return if (hour > currentHour) {
+            true
+        } else if (hour == currentHour) {
+            minute >= currentMinute
+        } else {
+            false
+        }
+    }
+    return true
+}
+
+private fun isSubTaskToday(date: String): Boolean {
+    if (date.isEmpty()) return false
+
+    try {
+        val parts = date.split(".")
+        if (parts.size == 3) {
+            val day = parts[0].toInt()
+            val month = parts[1].toInt()
+            val year = parts[2].toInt()
+
+            val calendar = Calendar.getInstance()
+            val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+            val currentMonth = calendar.get(Calendar.MONTH) + 1
+            val currentYear = calendar.get(Calendar.YEAR)
+
+            return day == currentDay && month == currentMonth && year == currentYear
+        }
+    } catch (e: Exception) {
+        return false
+    }
+    return false
+
 }
