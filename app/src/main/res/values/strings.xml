@@ -9,11 +9,14 @@
     <string name="form_create">Create</string>
     <string name="toast_datetime_error">Select date or choose time!</string>
     <string name="toast_text_error">Enter a task!</string>
+    <string name="time_cannot_be_past">Cannot select past time</string>
+
     <string name="toast_task_created">A task has been created!</string>
     <string name="toast_task_removed">A task has been removed!</string>
     <string name="toast_subtask_created">A subtask has been created!</string>
     <string name="toast_subtask_removed">A subtask has been removed!</string>
     <string name="new_task">New task!</string>
+
     <string name="settings_title">Settings</string>
     <string name="theme_settings">Theme</string>
     <string name="theme_light">Light</string>

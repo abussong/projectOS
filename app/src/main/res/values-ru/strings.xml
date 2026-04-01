@@ -10,6 +10,8 @@
     <string name="form_create">Создать</string>
     <string name="toast_datetime_error">Выберите дату или время!</string>
     <string name="toast_text_error">Введите текст задачи!</string>
+    <string name="time_cannot_be_past">Нельзя выбрать прошедшее время</string>
+
     <string name="toast_task_created">Новая задача добавлена!</string>
     <string name="toast_task_removed">Задача была удалена!</string>
     <string name="new_task">Новое напоминание!</string>

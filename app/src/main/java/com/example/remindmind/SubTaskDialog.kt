@@ -146,7 +146,8 @@ fun SubTaskDatePicker(viewModel: RemindersViewModel) {
     val datePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
-            viewModel.subTaskDate = "${Utils.addZero(selectedDay)}.${Utils.addZero(selectedMonth + 1)}.$selectedYear"
+            viewModel.subTaskDate =
+                "${Utils.addZero(selectedDay)}.${Utils.addZero(selectedMonth + 1)}.$selectedYear"
         },
         year, month, day
     ).apply {
@@ -193,6 +194,7 @@ fun SubTaskTimePicker(viewModel: RemindersViewModel) {
     val calendar = Calendar.getInstance()
     val hour = calendar.get(Calendar.HOUR_OF_DAY)
     val minute = calendar.get(Calendar.MINUTE)
+    val errorMessage = stringResource(id = R.string.time_cannot_be_past)
 
     val timePickerDialog = TimePickerDialog(
         context,
@@ -200,7 +202,13 @@ fun SubTaskTimePicker(viewModel: RemindersViewModel) {
 
             val dateForValidation = if (viewModel.subTaskDate.isEmpty()) {
                 val today = Calendar.getInstance()
-                "${Utils.addZero(today.get(Calendar.DAY_OF_MONTH))}.${Utils.addZero(today.get(Calendar.MONTH) + 1)}.${today.get(Calendar.YEAR)}"
+                "${Utils.addZero(today.get(Calendar.DAY_OF_MONTH))}.${
+                    Utils.addZero(
+                        today.get(
+                            Calendar.MONTH
+                        ) + 1
+                    )
+                }.${today.get(Calendar.YEAR)}"
             } else {
                 viewModel.subTaskDate
             }
@@ -210,14 +218,19 @@ fun SubTaskTimePicker(viewModel: RemindersViewModel) {
 
                 if (viewModel.subTaskDate.isEmpty()) {
                     val today = Calendar.getInstance()
-                    viewModel.subTaskDate = "${Utils.addZero(today.get(Calendar.DAY_OF_MONTH))}.${Utils.addZero(today.get(Calendar.MONTH) + 1)}.${today.get(Calendar.YEAR)}"
+                    viewModel.subTaskDate = "${Utils.addZero(today.get(Calendar.DAY_OF_MONTH))}.${
+                        Utils.addZero(
+                            today.get(Calendar.MONTH) + 1
+                        )
+                    }.${today.get(Calendar.YEAR)}"
                 }
 
-                viewModel.subTaskTime = "${Utils.addZero(selectedHour)}:${Utils.addZero(selectedMinute)}"
+                viewModel.subTaskTime =
+                    "${Utils.addZero(selectedHour)}:${Utils.addZero(selectedMinute)}"
             } else {
                 android.widget.Toast.makeText(
                     context,
-                    "Нельзя выбрать прошедшее время",
+                    errorMessage,
                     android.widget.Toast.LENGTH_SHORT
                 ).show()
             }
