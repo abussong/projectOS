@@ -255,6 +255,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.remindmind.ui.theme.white
 import java.util.Calendar
 
 @Composable
@@ -344,8 +345,9 @@ fun PrioritySelectorComponent(viewModel: RemindersViewModel) {
                 onClick = { viewModel.selectedPriority = Priority.HIGH },
                 label = { Text(stringResource(id = R.string.priority_high)) },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = colors.secondary,
-                    selectedLabelColor = Color.White
+                    selectedContainerColor = Color(0xFF03DAC5),
+                    selectedLabelColor = Color.White,
+                    labelColor = colors.boxtext
                 )
             )
             FilterChip(
@@ -353,8 +355,9 @@ fun PrioritySelectorComponent(viewModel: RemindersViewModel) {
                 onClick = { viewModel.selectedPriority = Priority.MEDIUM },
                 label = { Text(stringResource(id = R.string.priority_medium)) },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = colors.secondary,
-                    selectedLabelColor = Color.White
+                    selectedContainerColor = Color(0xFF03DAC5),
+                    selectedLabelColor = Color.White,
+                    labelColor = colors.boxtext
                 )
             )
             FilterChip(
@@ -362,8 +365,9 @@ fun PrioritySelectorComponent(viewModel: RemindersViewModel) {
                 onClick = { viewModel.selectedPriority = Priority.LOW },
                 label = { Text(stringResource(id = R.string.priority_low)) },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = colors.secondary,
-                    selectedLabelColor = Color.White
+                    selectedContainerColor = Color(0xFF03DAC5),
+                    selectedLabelColor = Color.White,
+                    labelColor = colors.boxtext
                 )
             )
         }
@@ -393,13 +397,18 @@ fun DateInputFieldComponent(viewModel: RemindersViewModel) {
     val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH)
     val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+
     val datePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
             viewModel.date = "${Utils.addZero(selectedDay)}.${Utils.addZero(selectedMonth + 1)}.$selectedYear"
         },
         year, month, day
-    )
+    ).apply {
+
+        datePicker.minDate = calendar.timeInMillis
+    }
 
     Box {
         TextField(
@@ -421,7 +430,8 @@ fun DateInputFieldComponent(viewModel: RemindersViewModel) {
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.form_date_hint),
-                    color = colors.secondary
+                    color = colors.secondary,
+                    fontSize = 14.sp
                 )
             }
         )
@@ -434,14 +444,37 @@ fun TimeInputFieldComponent(viewModel: RemindersViewModel) {
     val colors = LocalAppColors.current
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
-    val hour = calendar.get(Calendar.HOUR_OF_DAY)
-    val minute = calendar.get(Calendar.MINUTE)
+    val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+    val currentMinute = calendar.get(Calendar.MINUTE)
+
     val timePickerDialog = TimePickerDialog(
         context,
         { _: TimePicker, selectedHour: Int, selectedMinute: Int ->
-            viewModel.time = "${Utils.addZero(selectedHour)}:${Utils.addZero(selectedMinute)}"
+
+            val dateForValidation = if (viewModel.date.isEmpty()) {
+                val today = Calendar.getInstance()
+                "${Utils.addZero(today.get(Calendar.DAY_OF_MONTH))}.${Utils.addZero(today.get(Calendar.MONTH) + 1)}.${today.get(Calendar.YEAR)}"
+            } else {
+                viewModel.date
+            }
+
+
+            if (isTimeValidForMain(dateForValidation, selectedHour, selectedMinute)) {
+
+                if (viewModel.date.isEmpty()) {
+                    val today = Calendar.getInstance()
+                    viewModel.date = "${Utils.addZero(today.get(Calendar.DAY_OF_MONTH))}.${Utils.addZero(today.get(Calendar.MONTH) + 1)}.${today.get(Calendar.YEAR)}"
+                }
+                viewModel.time = "${Utils.addZero(selectedHour)}:${Utils.addZero(selectedMinute)}"
+            } else {
+                android.widget.Toast.makeText(
+                    context,
+                    "Нельзя выбрать прошедшее время",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
         },
-        hour, minute, true
+        currentHour, currentMinute, true
     )
 
     Box {
@@ -450,7 +483,23 @@ fun TimeInputFieldComponent(viewModel: RemindersViewModel) {
             onValueChange = { viewModel.time = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { timePickerDialog.show() },
+                .clickable {
+
+                    if (viewModel.date.isEmpty()) {
+
+                        timePickerDialog.show()
+                    } else {
+
+                        if (isTodayForMain(viewModel.date)) {
+                            val currentCalendar = Calendar.getInstance()
+                            timePickerDialog.updateTime(
+                                currentCalendar.get(Calendar.HOUR_OF_DAY),
+                                currentCalendar.get(Calendar.MINUTE)
+                            )
+                        }
+                        timePickerDialog.show()
+                    }
+                },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = colors.surface,
                 unfocusedContainerColor = colors.surface,
@@ -466,13 +515,60 @@ fun TimeInputFieldComponent(viewModel: RemindersViewModel) {
             text = if (viewModel.time.isNotEmpty()) viewModel.time
             else stringResource(id = R.string.form_time_hint),
             color = colors.secondary,
+            fontSize = 14.sp,
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = 10.dp)
+                .padding(start = 16.dp)
         )
     }
 }
 
+private fun isTimeValidForMain(date: String, hour: Int, minute: Int): Boolean {
+
+    if (date.isEmpty()) return false
+
+
+    if (isTodayForMain(date)) {
+        val currentCalendar = Calendar.getInstance()
+        val currentHour = currentCalendar.get(Calendar.HOUR_OF_DAY)
+        val currentMinute = currentCalendar.get(Calendar.MINUTE)
+
+
+        return if (hour > currentHour) {
+            true
+        } else if (hour == currentHour) {
+            minute >= currentMinute
+        } else {
+            false
+        }
+    }
+
+
+    return true
+}
+
+private fun isTodayForMain(date: String): Boolean {
+    if (date.isEmpty()) return false
+
+    try {
+        val parts = date.split(".")
+        if (parts.size == 3) {
+            val day = parts[0].toInt()
+            val month = parts[1].toInt()
+            val year = parts[2].toInt()
+
+            val calendar = Calendar.getInstance()
+            val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+            val currentMonth = calendar.get(Calendar.MONTH) + 1
+            val currentYear = calendar.get(Calendar.YEAR)
+
+            return day == currentDay && month == currentMonth && year == currentYear
+        }
+    } catch (e: Exception) {
+        return false
+    }
+    return false
+}
 @Composable
 fun CreateButtonComponent(onClick: () -> Unit) {
     val colors = LocalAppColors.current

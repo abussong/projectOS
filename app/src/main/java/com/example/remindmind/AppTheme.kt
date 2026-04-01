@@ -152,27 +152,29 @@ class AppColors(
     val buttonGradientStart: Color,
     val buttonGradientEnd: Color,
     val cardBackground: Color,
-    val statusBarColor: Color
+    val statusBarColor: Color,
+    val boxtext: Color
 )
 
 // Предопределенные темы
 val LightThemeColors = AppColors(
-    primary = Color(0xFF242B5F), // navy
-    secondary = Color(0xFF03DAC5), // teal_200
-    background = Color(0xFFFFFFFF),
-    surface = Color(0xFFF5F5F5),
+    primary = white, // navy
+    secondary = Color(0xFF000000), // teal_200
+    background = white,
+    surface = white,
     text = Color(0xFF000000),
     textSecondary = Color(0xFF5E6995), // lightnavy
     border = Color(0xFF03DAC5), // teal_200
     buttonGradientStart = Color(0xFF03DAC5), // teal_200
     buttonGradientEnd = Color(0xFF5E6995), // lightnavy
     cardBackground = Color(0xFFF0F0F0),
-    statusBarColor = Color(0xFF242B5F) // navy
+    statusBarColor = Color(0xFF242B5F),
+    boxtext = Color(0xFF000000)// navy
 )
 
 val DarkThemeColors = AppColors(
-    primary = Color(0xFF242B5F), // navy
-    secondary = Color(0xFF03DAC5), // teal_200
+    primary = Color(0xFF121212), // navy
+    secondary = white, // teal_200
     background = Color(0xFF121212),
     surface = Color(0xFF1E1E1E),
     text = Color(0xFFFFFFFF),
@@ -181,7 +183,8 @@ val DarkThemeColors = AppColors(
     buttonGradientStart = Color(0xFF03DAC5), // teal_200
     buttonGradientEnd = Color(0xFF5E6995), // lightnavy
     cardBackground = Color(0xFF2D2D2D),
-    statusBarColor = Color(0xFF000000)
+    statusBarColor = Color(0xFF000000),
+    boxtext = white
 )
 
 val NavyThemeColors = AppColors(
@@ -195,7 +198,8 @@ val NavyThemeColors = AppColors(
     buttonGradientStart = Color(0xFF03DAC5), // teal_200
     buttonGradientEnd = Color(0xFF5E6995), // lightnavy
     cardBackground = Color(0xFF242B5F), // navy
-    statusBarColor = Color(0xFF000000)
+    statusBarColor = Color(0xFF000000),
+    boxtext = Color(0xFF03DAC5)
 )
 
 // Enum для типов тем
@@ -215,6 +219,27 @@ fun getCurrentTheme(themeType: ThemeType): AppColors {
         ThemeType.LIGHT -> LightThemeColors
         ThemeType.DARK -> DarkThemeColors
         ThemeType.NAVY -> NavyThemeColors
+    }
+}
+
+// DataStore для сохранения выбранной темы
+private val Context.dataStore by preferencesDataStore("settings")
+
+class ThemePreferences(private val context: Context) {
+    companion object {
+        val THEME_KEY = stringPreferencesKey("theme")
+    }
+
+    val themeFlow: Flow<ThemeType> = context.dataStore.data
+        .map { preferences ->
+            val themeName = preferences[THEME_KEY] ?: ThemeType.NAVY.name
+            ThemeType.valueOf(themeName)
+        }
+
+    suspend fun saveTheme(theme: ThemeType) {
+        context.dataStore.edit { preferences ->
+            preferences[THEME_KEY] = theme.name
+        }
     }
 }
 
