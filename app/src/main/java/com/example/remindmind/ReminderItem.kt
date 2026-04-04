@@ -186,6 +186,8 @@ fun SubTaskItem(
                 modifier = Modifier.size(24.dp)
             )
 
+            Spacer(modifier = Modifier.width(8.dp))
+
             Column(
                 modifier = Modifier.weight(1f)
             ) {

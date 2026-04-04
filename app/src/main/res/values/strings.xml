@@ -32,4 +32,35 @@
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
     <string name="no_subtasks">No subtasks yet</string>
+
+    <string name="configure_notification">Configure notification</string>
+
+    <string name="notification_settings_title">Notification Settings</string>
+    <string name="repeat_period">Repeat period</string>
+    <string name="repeat_once">Once</string>
+    <string name="repeat_daily">Daily</string>
+    <string name="repeat_weekly">Weekly</string>
+    <string name="select_days">Select days</string>
+    <string name="mon_short">Mon</string>
+    <string name="tue_short">Tue</string>
+    <string name="wed_short">Wed</string>
+    <string name="thu_short">Thu</string>
+    <string name="fri_short">Fri</string>
+    <string name="sat_short">Sat</string>
+    <string name="sun_short">Sun</string>
+    <string name="notification_sound">Notification sound</string>
+    <string name="select_sound">Select sound</string>
+    <string name="select_sound_title">Select notification sound</string>
+    <string name="default_sound">Default sound</string>
+    <string name="custom_sound">Custom sound: %s</string>
+    <string name="selected">selected</string>
+    <string name="reset_to_default">Reset to default</string>
+    <string name="reset_to_default_sound">Reset to default sound</string>
+    <string name="sound_selected">Sound selected</string>
+    <string name="vibration">Vibration</string>
+    <string name="notification_repeats">Notification repeats</string>
+    <string name="repeat_count">Count:</string>
+    <string name="repeat_interval_minutes">Interval (min):</string>
+    <string name="interval_hint">Minimum 1 minute, maximum 60 minutes</string>
+    <string name="apply">Apply</string>
 </resources>

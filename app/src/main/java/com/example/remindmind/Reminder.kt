@@ -1,4 +1,4 @@
-package com.example.remindmind
+/*package com.example.remindmind
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
@@ -27,4 +27,36 @@ data class Reminder(
     var isCompleted: Boolean = false,
     val priority: Priority = Priority.MEDIUM,
     val subTasks: SnapshotStateList<SubTask> = mutableStateListOf()  // Изменяем тип
+)*/
+// Reminder.kt (обновленная версия)
+package com.example.remindmind
+
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.mutableStateListOf
+
+enum class Priority {
+    HIGH,
+    MEDIUM,
+    LOW
+}
+
+data class SubTask(
+    val id: Int,
+    val text: String,
+    val date: String,
+    val time: String,
+    var isCompleted: Boolean = false,
+    val priority: Priority = Priority.MEDIUM,
+    val notificationSettings: NotificationSettings = NotificationSettings() // Добавляем настройки
+)
+
+data class Reminder(
+    val id: Int,
+    val text: String,
+    val date: String,
+    val time: String,
+    var isCompleted: Boolean = false,
+    val priority: Priority = Priority.MEDIUM,
+    val subTasks: SnapshotStateList<SubTask> = mutableStateListOf(),
+    val notificationSettings: NotificationSettings = NotificationSettings() // Добавляем настройки
 )
