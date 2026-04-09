@@ -42,7 +42,7 @@ class SettingsActivity : ComponentActivity() {
                     onBackPressed = { finish() }
                 )
             }
-        }32321
+        }
     }
 }
 

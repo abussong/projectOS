@@ -58,7 +58,6 @@ fun Form(viewModel: RemindersViewModel = viewModel()) {
         PrioritySelectorComponent(viewModel)
         DateTimeInputFieldsComponent(viewModel)
 
-        // Кнопка настроек уведомлений - простой и надежный вариант
         Button(
             onClick = { showNotificationSettings = true },
             modifier = Modifier
@@ -76,10 +75,9 @@ fun Form(viewModel: RemindersViewModel = viewModel()) {
         }
 
         CreateButtonComponent {
-            viewModel.addReminder(context)
+            viewModel.addReminder(context)  // Проверка будет внутри метода
         }
     }
-
 
     if (showNotificationSettings) {
         NotificationSettingsDialog(
@@ -200,7 +198,22 @@ fun DateInputFieldComponent(viewModel: RemindersViewModel) {
     val datePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
-            viewModel.date = "${Utils.addZero(selectedDay)}.${Utils.addZero(selectedMonth + 1)}.$selectedYear"
+            val newDate = "${Utils.addZero(selectedDay)}.${Utils.addZero(selectedMonth + 1)}.$selectedYear"
+
+            // Проверяем и очищаем время если нужно
+            if (viewModel.time.isNotEmpty() && isTodayForMain(newDate)) {
+                val currentTime = Calendar.getInstance()
+                val selectedHour = viewModel.time.split(":")[0].toInt()
+                val selectedMinute = viewModel.time.split(":")[1].toInt()
+
+                if (selectedHour < currentTime.get(Calendar.HOUR_OF_DAY) ||
+                    (selectedHour == currentTime.get(Calendar.HOUR_OF_DAY) &&
+                            selectedMinute < currentTime.get(Calendar.MINUTE))) {
+                    viewModel.time = ""  // Просто очищаем поле времени
+                }
+            }
+
+            viewModel.date = newDate
         },
         year, month, day
     ).apply {

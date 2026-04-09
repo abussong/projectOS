@@ -11,6 +11,13 @@
     <string name="toast_text_error">Enter a task!</string>
     <string name="time_cannot_be_past">Cannot select past time</string>
 
+    <string name="edit_task">Edit a task</string>
+    <string name="edit_subtask">Edit a subtask</string>
+    <string name="task_text">Task text</string>
+    <string name="subtask_text">Subtask text</string>
+    <string name="save">Сохранить</string>
+    <string name="toast_task_updated">Task update</string>
+    <string name="toast_subtask_updated">Subtask update</string>
     <string name="toast_task_created">A task has been created!</string>
     <string name="toast_task_removed">A task has been removed!</string>
     <string name="toast_subtask_created">A subtask has been created!</string>

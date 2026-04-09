@@ -164,10 +164,26 @@ fun SubTaskDatePicker(viewModel: RemindersViewModel) {
     val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH)
     val day = calendar.get(Calendar.DAY_OF_MONTH)
+
     val datePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
-            viewModel.subTaskDate = "${Utils.addZero(selectedDay)}.${Utils.addZero(selectedMonth + 1)}.$selectedYear"
+            val newDate = "${Utils.addZero(selectedDay)}.${Utils.addZero(selectedMonth + 1)}.$selectedYear"
+
+            // Проверяем и очищаем время если нужно
+            if (viewModel.subTaskTime.isNotEmpty() && isSubTaskToday(newDate)) {
+                val currentTime = Calendar.getInstance()
+                val selectedHour = viewModel.subTaskTime.split(":")[0].toInt()
+                val selectedMinute = viewModel.subTaskTime.split(":")[1].toInt()
+
+                if (selectedHour < currentTime.get(Calendar.HOUR_OF_DAY) ||
+                    (selectedHour == currentTime.get(Calendar.HOUR_OF_DAY) &&
+                            selectedMinute < currentTime.get(Calendar.MINUTE))) {
+                    viewModel.subTaskTime = ""  // Просто очищаем поле времени
+                }
+            }
+
+            viewModel.subTaskDate = newDate
         },
         year, month, day
     ).apply {
