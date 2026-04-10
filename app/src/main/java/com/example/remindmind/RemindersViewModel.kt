@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 class RemindersViewModel : ViewModel() {
@@ -34,8 +35,78 @@ class RemindersViewModel : ViewModel() {
     var subTaskNotificationSettings by mutableStateOf(NotificationSettings())
 
     val reminders = mutableStateListOf<Reminder>()
+    fun editReminderText(reminder: Reminder, newText: String, context: Context) {
+        if (newText.isBlank()) return
+
+        // Отменяем старые уведомления
+        cancelNotification(context, reminder.id)
+
+        // Обновляем текст в объекте
+        reminder.text = newText
+
+        // Обновляем в базе данных
+        val values = ContentValues().apply {
+            put(DatabaseHelper.COLUMN_TEXT, newText)
+        }
+        dbHelper.writableDatabase?.update(
+            DatabaseHelper.TABLE_REMINDERS,
+            values,
+            "${DatabaseHelper.COLUMN_ID}=?",
+            arrayOf(reminder.id.toString())
+        )
+
+        // Если задача не выполнена и не просрочена - планируем новое уведомление с новым текстом
+        if (!reminder.isCompleted && !Utils.isReminderInPast(reminder.date, reminder.time)) {
+            scheduleNotificationWithSettings(context, reminder)
+        }
+
+        // Обновляем в списке reminders
+        val index = reminders.indexOf(reminder)
+        if (index != -1) {
+            reminders[index] = reminder.copy(text = newText, isCompleted = reminder.isCompleted)
+        }
+
+        sortReminders()
+        Toast.makeText(context, R.string.toast_task_updated, Toast.LENGTH_LONG).show()
+    }
+
+    fun editSubTaskText(reminder: Reminder, subTask: SubTask, newText: String, context: Context) {
+        if (newText.isBlank()) return
+
+        // Отменяем старые уведомления подзадачи
+        cancelNotification(context, subTask.id)
+
+
+        subTask.text = newText
+
+
+        val values = ContentValues().apply {
+            put(DatabaseHelper.COLUMN_SUBTASK_TEXT, newText)
+        }
+        dbHelper.writableDatabase?.update(
+            DatabaseHelper.TABLE_SUBTASKS,
+            values,
+            "${DatabaseHelper.COLUMN_SUBTASK_ID}=?",
+            arrayOf(subTask.id.toString())
+        )
+
+
+        if (!subTask.isCompleted && !Utils.isReminderInPast(subTask.date, subTask.time)) {
+            scheduleNotificationWithSettings(context, subTask)
+        }
+
+
+        val index = reminder.subTasks.indexOf(subTask)
+        if (index != -1) {
+            reminder.subTasks[index] = subTask.copy(text = newText, isCompleted = subTask.isCompleted)
+        }
+
+        sortReminders()
+        Toast.makeText(context, R.string.toast_subtask_updated, Toast.LENGTH_LONG).show()
+    }
 
     fun addReminder(context: Context) {
+        // Проверяем, заполнена ли дата и время
         if (date.isEmpty() && time.isEmpty()) {
             Toast.makeText(context, R.string.toast_datetime_error, Toast.LENGTH_LONG).show()
             return
@@ -46,6 +117,23 @@ class RemindersViewModel : ViewModel() {
 
         val finalDate = if (date.isEmpty()) Utils.getCurrentDate() else date
         val finalTime = if (time.isEmpty()) "12:00" else time
+
+        // ФИНАЛЬНАЯ ПРОВЕРКА: если дата сегодня, проверяем что время не в прошлом
+        if (isTodayForMain(finalDate)) {
+            val currentCalendar = Calendar.getInstance()
+            val currentHour = currentCalendar.get(Calendar.HOUR_OF_DAY)
+            val currentMinute = currentCalendar.get(Calendar.MINUTE)
+
+            val timeParts = finalTime.split(":")
+            val selectedHour = timeParts[0].toInt()
+            val selectedMinute = timeParts[1].toInt()
+
+            // Если время уже прошло
+            if (selectedHour < currentHour || (selectedHour == currentHour && selectedMinute < currentMinute)) {
+                Toast.makeText(context, R.string.time_cannot_be_past, Toast.LENGTH_LONG).show()
+                return  // Не создаем задачу
+            }
+        }
 
         val reminder = Reminder(
             id = Utils.getID(),
@@ -74,6 +162,7 @@ class RemindersViewModel : ViewModel() {
         }
         dbHelper.writableDatabase?.insert(DatabaseHelper.TABLE_REMINDERS, null, values)
 
+
         text = ""
         date = ""
         time = ""
@@ -87,6 +176,7 @@ class RemindersViewModel : ViewModel() {
         sortReminders()
         Toast.makeText(context, R.string.toast_task_created, Toast.LENGTH_LONG).show()
     }
+
 
     fun addSubTask(context: Context, parentReminder: Reminder) {
         if (subTaskDate.isEmpty() && subTaskTime.isEmpty()) {
@@ -596,6 +686,30 @@ class RemindersViewModel : ViewModel() {
                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, repeatTime, pendingIntent)
                 }
             }
+        }
+    }
+    private fun isTodayForMain(date: String): Boolean {
+        if (date.isEmpty()) return false
+
+        try {
+
+            val dayStr = date.substringBefore(".")
+            val remaining = date.substringAfter(".")
+            val monthStr = remaining.substringBefore(".")
+            val yearStr = remaining.substringAfter(".")
+
+            val day = dayStr.toIntOrNull() ?: return false
+            val month = monthStr.toIntOrNull() ?: return false
+            val year = yearStr.toIntOrNull() ?: return false
+
+            val calendar = Calendar.getInstance()
+            val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+            val currentMonth = calendar.get(Calendar.MONTH) + 1
+            val currentYear = calendar.get(Calendar.YEAR)
+
+            return day == currentDay && month == currentMonth && year == currentYear
+        } catch (e: Exception) {
+            return false
         }
     }
 

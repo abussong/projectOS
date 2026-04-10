@@ -22,6 +22,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         // Новые колонки для напоминаний
         const val COLUMN_REPEAT_TYPE = "repeat_type"
+
         const val COLUMN_SELECTED_DAYS = "selected_days"
         const val COLUMN_SOUND_URI = "sound_uri"
         const val COLUMN_VIBRATION_ENABLED = "vibration_enabled"

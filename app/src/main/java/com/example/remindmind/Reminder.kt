@@ -42,7 +42,7 @@ enum class Priority {
 
 data class SubTask(
     val id: Int,
-    val text: String,
+    var text: String,
     val date: String,
     val time: String,
     var isCompleted: Boolean = false,
@@ -52,7 +52,7 @@ data class SubTask(
 
 data class Reminder(
     val id: Int,
-    val text: String,
+    var text: String,
     val date: String,
     val time: String,
     var isCompleted: Boolean = false,

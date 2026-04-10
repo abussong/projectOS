@@ -28,6 +28,7 @@ fun ReminderItem(
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(reminder.isCompleted) }
+    var showEditDialog by remember { mutableStateOf(false) }
 
     // Синхронизируем состояние с моделью
     LaunchedEffect(reminder.isCompleted) {
@@ -72,7 +73,9 @@ fun ReminderItem(
                     )
 
                     Column(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { showEditDialog = true }
                     ) {
                         Text(
                             text = reminder.text,
@@ -145,6 +148,17 @@ fun ReminderItem(
             }
         }
     }
+
+    if (showEditDialog) {
+        EditReminderDialog(
+            reminder = reminder,
+            onDismiss = { showEditDialog = false },
+            onSave = { newText ->
+                viewModel.editReminderText(reminder, newText, context)
+                showEditDialog = false
+            }
+        )
+    }
 }
 
 @Composable
@@ -156,6 +170,7 @@ fun SubTaskItem(
     val colors = LocalAppColors.current
     val context = LocalContext.current
     var checked by remember { mutableStateOf(subTask.isCompleted) }
+    var showEditDialog by remember { mutableStateOf(false) }
 
     // Синхронизируем состояние с моделью
     LaunchedEffect(subTask.isCompleted) {
@@ -170,7 +185,9 @@ fun SubTaskItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .clickable { showEditDialog = true },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
@@ -212,6 +229,119 @@ fun SubTaskItem(
             Text(text = "✕", color = colors.secondary, fontSize = 14.sp)
         }
     }
+
+    if (showEditDialog) {
+        EditSubTaskDialog(
+            subTask = subTask,
+            reminder = reminder,
+            onDismiss = { showEditDialog = false },
+            onSave = { newText ->
+                viewModel.editSubTaskText(reminder, subTask, newText, context)
+                showEditDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+fun EditReminderDialog(
+    reminder: Reminder,
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    val colors = LocalAppColors.current
+    var text by remember { mutableStateOf(reminder.text) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.edit_task),
+                color = colors.text
+            )
+        },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                label = { Text(stringResource(R.string.task_text)) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = colors.secondary,
+                    unfocusedTextColor = colors.text,
+                    focusedBorderColor = colors.secondary,
+                    unfocusedBorderColor = colors.textSecondary,
+                    focusedLabelColor = colors.secondary,
+                    unfocusedLabelColor = colors.textSecondary
+                )
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = { if (text.isNotBlank()) onSave(text) },
+                colors = ButtonDefaults.buttonColors(colors.secondary)
+            ) {
+                Text(stringResource(R.string.save), color = Color.Black)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel), color = colors.textSecondary)
+            }
+        },
+        containerColor = colors.surface
+    )
+}
+
+@Composable
+fun EditSubTaskDialog(
+    subTask: SubTask,
+    reminder: Reminder,
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    val colors = LocalAppColors.current
+    var text by remember { mutableStateOf(subTask.text) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.edit_subtask),
+                color = colors.text
+            )
+        },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                label = { Text(stringResource(R.string.subtask_text)) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = colors.secondary,
+                    unfocusedTextColor = colors.text,
+                    focusedBorderColor = colors.secondary,
+                    unfocusedBorderColor = colors.textSecondary,
+                    focusedLabelColor = colors.secondary,
+                    unfocusedLabelColor = colors.textSecondary
+                )
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = { if (text.isNotBlank()) onSave(text) },
+                colors = ButtonDefaults.buttonColors(colors.secondary)
+            ) {
+                Text(stringResource(R.string.save), color = Color.Black)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel), color = colors.textSecondary)
+            }
+        },
+        containerColor = colors.surface
+    )
 }
 
 @Composable
