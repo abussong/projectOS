@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ============================================================================
+  Манифест приложения RemindMind
+  ============================================================================
+  Версия: 2.0.1
+  Авторы: Грехов М.В., Яньшина А.Ю.
+
+  Описание: Основной файл конфигурации приложения. Определяет компоненты,
+           разрешения и метаданные приложения.
+  ============================================================================
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- ==================== РАЗРЕШЕНИЯ ==================== -->
+
+    <!-- Уведомления (Android 13+, API 33+) - для отображения напоминаний -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <!-- Точные будильники (Android 12+, API 31+) - для точного срабатывания -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
+    <!-- Альтернативное разрешение для точных будильников -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:ignore="ProtectedPermissions"/>
+
+    <!-- Вибрация - для тактильной обратной связи при уведомлениях -->
     <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- WakeLock - чтобы устройство не засыпало при воспроизведении звука -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -18,6 +40,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Remindmind">
+
+        <!-- ==================== ГЛАВНОЕ ACTIVITY ==================== -->
+        <!-- Главный экран: список задач + форма создания -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -25,12 +50,21 @@
             android:theme="@style/Theme.Remindmind">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" android:exported="false" />
-        <receiver android:name=".ReminderBroadcastReceiver"/>
+
+        <!-- ==================== ACTIVITY НАСТРОЕК ==================== -->
+        <!-- Экран настроек: тема оформления, информация о приложении -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <!-- ==================== BROADCAST RECEIVER ==================== -->
+        <!-- Приёмник для отображения уведомлений при срабатывании будильника -->
+        <receiver
+            android:name=".ReminderBroadcastReceiver"/>
+
     </application>
 
 </manifest>

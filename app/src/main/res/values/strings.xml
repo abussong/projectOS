@@ -1,53 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ============================================================================
+  English string resources for RemindMind application
+  ============================================================================
+  Version: 2.0
+  Authors: Grekhov M.V., Yanshina A.Yu.
+
+  Description: All text strings used in the application (English localization).
+  ============================================================================
+-->
 <resources>
+    <!-- ==================== APP NAMES ==================== -->
     <string name="app_name">remindmind</string>
     <string name="app_title">remindmind</string>
+
+    <!-- ==================== PERMISSION WARNINGS ==================== -->
     <string name="permission_warning">You will not receive reminders without permission to send notifications!</string>
+
+    <!-- ==================== TASK CREATION FORM ==================== -->
     <string name="form_title">Create a task</string>
     <string name="form_text_hint">Enter a task</string>
     <string name="form_date_hint">Select a date</string>
     <string name="form_time_hint">Choose a time</string>
     <string name="form_create">Create</string>
+
+    <!-- ==================== ERROR MESSAGES ==================== -->
     <string name="toast_datetime_error">Select date or choose time!</string>
     <string name="toast_text_error">Enter a task!</string>
     <string name="time_cannot_be_past">Cannot select past time</string>
 
+    <!-- ==================== TASK EDITING (v2.0) ==================== -->
     <string name="edit_task">Edit a task</string>
     <string name="edit_subtask">Edit a subtask</string>
     <string name="task_text">Task text</string>
     <string name="subtask_text">Subtask text</string>
-    <string name="save">Сохранить</string>
-    <string name="toast_task_updated">Task update</string>
-    <string name="toast_subtask_updated">Subtask update</string>
+    <string name="save">Save</string>
+
+    <!-- ==================== TOAST MESSAGES ==================== -->
+    <string name="toast_task_updated">Task updated</string>
+    <string name="toast_subtask_updated">Subtask updated</string>
     <string name="toast_task_created">A task has been created!</string>
     <string name="toast_task_removed">A task has been removed!</string>
     <string name="toast_subtask_created">A subtask has been created!</string>
     <string name="toast_subtask_removed">A subtask has been removed!</string>
+
+    <!-- ==================== NOTIFICATIONS ==================== -->
     <string name="new_task">New task!</string>
 
+    <!-- ==================== THEME SETTINGS ==================== -->
     <string name="settings_title">Settings</string>
     <string name="theme_settings">Theme</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_navy">Navy</string>
     <string name="back">Back</string>
+
+    <!-- ==================== SUBTASKS ==================== -->
     <string name="subtask_title">Create Subtask</string>
     <string name="subtask_text_hint">Enter subtask</string>
+    <string name="no_subtasks">No subtasks yet</string>
+
+    <!-- ==================== PRIORITIES ==================== -->
     <string name="priority">Priority</string>
     <string name="priority_high">High</string>
     <string name="priority_medium">Medium</string>
     <string name="priority_low">Low</string>
+
+    <!-- ==================== DIALOG BUTTONS ==================== -->
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
-    <string name="no_subtasks">No subtasks yet</string>
+    <string name="apply">Apply</string>
 
+    <!-- ==================== NOTIFICATION SETTINGS ==================== -->
     <string name="configure_notification">Configure notification</string>
-
     <string name="notification_settings_title">Notification Settings</string>
     <string name="repeat_period">Repeat period</string>
     <string name="repeat_once">Once</string>
     <string name="repeat_daily">Daily</string>
     <string name="repeat_weekly">Weekly</string>
     <string name="select_days">Select days</string>
+
+    <!-- Short day names for chips -->
     <string name="mon_short">Mon</string>
     <string name="tue_short">Tue</string>
     <string name="wed_short">Wed</string>
@@ -55,6 +88,8 @@
     <string name="fri_short">Fri</string>
     <string name="sat_short">Sat</string>
     <string name="sun_short">Sun</string>
+
+    <!-- Sound settings -->
     <string name="notification_sound">Notification sound</string>
     <string name="select_sound">Select sound</string>
     <string name="select_sound_title">Select notification sound</string>
@@ -64,14 +99,17 @@
     <string name="reset_to_default">Reset to default</string>
     <string name="reset_to_default_sound">Reset to default sound</string>
     <string name="sound_selected">Sound selected</string>
+
+    <!-- Vibration settings -->
     <string name="vibration">Vibration</string>
+
+    <!-- Repeat settings -->
     <string name="notification_repeats">Notification repeats</string>
     <string name="repeat_count">Count:</string>
     <string name="repeat_interval_minutes">Interval (min):</string>
     <string name="interval_hint">Minimum 1 minute, maximum 60 minutes</string>
-    <string name="apply">Apply</string>
 
-    <!-- About section -->
+    <!-- ==================== ABOUT SECTION ==================== -->
     <string name="about_section">About</string>
     <string name="about_app">About App</string>
     <string name="app_version">Version %s</string>

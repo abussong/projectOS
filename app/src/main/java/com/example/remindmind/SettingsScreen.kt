@@ -25,7 +25,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 
+/**
+ * Activity для настроек приложения.
+ *
+ * Позволяет пользователю изменять тему оформления и просматривать информацию о приложении.
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ * @version 2.2.0
+ */
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +63,16 @@ class SettingsActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Экран настроек.
+ *
+ * @param currentTheme Текущая выбранная тема
+ * @param onThemeSelected Callback при выборе темы
+ * @param onBackPressed Callback при нажатии назад
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -101,6 +122,7 @@ fun SettingsScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Раздел выбора темы
                 item {
                     Text(
                         text = stringResource(id = R.string.theme_settings),
@@ -137,6 +159,7 @@ fun SettingsScreen(
                     )
                 }
 
+                // Раздел "О приложении" (добавлен в версии 2.2.0)
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
@@ -183,6 +206,17 @@ fun SettingsScreen(
     }
 }
 
+/**
+ * Опция выбора темы в виде карточки.
+ *
+ * @param title Название темы
+ * @param isSelected Выбрана ли тема
+ * @param colors Цветовая схема
+ * @param onClick Callback при выборе
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @Composable
 fun ThemeOption(
     title: String,
@@ -224,6 +258,18 @@ fun ThemeOption(
     }
 }
 
+/**
+ * Экран "О приложении" с информацией о разработчиках.
+ *
+ * Добавлен в версии 2.2.0.
+ * Котик добавлен в версии 2.1.0.
+ *
+ * @param onBackPressed Callback при нажатии назад
+ *
+ * @author Яньшина А.Ю.
+ * @since 2.2.0
+ * @version 2.1.0
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
@@ -266,7 +312,16 @@ fun AboutScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Название приложения (тонкий шрифт, как в заголовке)
+
+            Image(
+                painter = painterResource(id = R.drawable.remindmind_icon2),
+                contentDescription = "Cute cat",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(24.dp))
+            )
+
+            // Название приложения (осталось как было)
             Text(
                 text = stringResource(id = R.string.app_title),
                 fontSize = 32.sp,
@@ -276,7 +331,7 @@ fun AboutScreen(
             )
 
             Text(
-                text = stringResource(id = R.string.app_version, "2.0.1"),
+                text = stringResource(id = R.string.app_version, "2.1.0"),
                 fontSize = 14.sp,
                 color = colors.textSecondary
             )
@@ -362,6 +417,15 @@ fun AboutScreen(
     }
 }
 
+/**
+ * Элемент отображения контакта с email.
+ *
+ * @param email Адрес электронной почты
+ * @param colors Цветовая схема
+ *
+ * @author Яньшина А.Ю.
+ * @since 2.2.0
+ */
 @Composable
 fun ContactItem(
     email: String,

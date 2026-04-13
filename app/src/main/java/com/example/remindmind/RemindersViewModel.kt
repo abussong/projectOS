@@ -15,36 +15,88 @@ import org.threeten.bp.format.DateTimeFormatter
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-
+/**
+ * ViewModel для управления напоминаниями и подзадачами.
+ *
+ * Содержит всю бизнес-логику приложения: создание, редактирование, удаление задач,
+ * управление уведомлениями, сортировку и автоматическую очистку.
+ *
+ * @author Грехов М.В. (приоритеты, темы, проверки времени, редактирование текста)
+ * @author Яньшина А.Ю. (подзадачи, кастомизация уведомлений, автоматическая очистка)
+ * @since 1.0.0
+ * @version 2.2.0
+ */
 class RemindersViewModel : ViewModel() {
+    // ==================== Базовые поля ====================
+
+    /** Помощник для работы с базой данных */
     lateinit var dbHelper: DatabaseHelper
+
+    /** Менеджер будильников для планирования уведомлений */
     lateinit var alarmManager: AlarmManager
 
+    /** Текст новой задачи */
     var text by mutableStateOf("")
+
+    /** Дата новой задачи (формат dd.MM.yyyy) */
     var date by mutableStateOf("")
+
+    /** Время новой задачи (формат HH:mm) */
     var time by mutableStateOf("")
+
+    /** Приоритет новой задачи */
     var selectedPriority by mutableStateOf(Priority.MEDIUM)
+
+    /** Временные настройки уведомления для новой задачи (добавлены в версии 2.0.0) */
     var tempNotificationSettings by mutableStateOf(NotificationSettings())
 
+    // ==================== Поля для подзадач ====================
+
+    /** Флаг отображения диалога создания подзадачи (добавлено в версии 1.2.0) */
     var showSubTaskDialog by mutableStateOf(false)
+
+    /** Текущее напоминание, для которого создается подзадача */
     var currentReminderForSubTask: Reminder? by mutableStateOf(null)
+
+    /** Текст новой подзадачи */
     var subTaskText by mutableStateOf("")
+
+    /** Дата новой подзадачи */
     var subTaskDate by mutableStateOf("")
+
+    /** Время новой подзадачи */
     var subTaskTime by mutableStateOf("")
+
+    /** Приоритет новой подзадачи (добавлен в версии 1.1.0, для подзадач с 1.2.0) */
     var subTaskPriority by mutableStateOf(Priority.MEDIUM)
+
+    /** Настройки уведомления для подзадачи (добавлены в версии 2.0.0) */
     var subTaskNotificationSettings by mutableStateOf(NotificationSettings())
 
+    // ==================== Список напоминаний ====================
+
+    /** Список всех напоминаний (автоматически обновляется в UI) */
     val reminders = mutableStateListOf<Reminder>()
+
+    // ==================== Редактирование текста (добавлено в версии 2.1.0) ====================
+
+    /**
+     * Редактирует текст существующего напоминания.
+     *
+     * Обновляет текст в объекте, базе данных и перепланирует уведомление
+     * с новым текстом, если задача не выполнена и не просрочена.
+     *
+     * @param reminder Напоминание для редактирования
+     * @param newText Новый текст напоминания
+     * @param context Контекст приложения
+     *
+     * @author Грехов М.В.
+     * @since 2.1.0
+     */
     fun editReminderText(reminder: Reminder, newText: String, context: Context) {
         if (newText.isBlank()) return
-
-        // Отменяем старые уведомления
         cancelNotification(context, reminder.id)
-
-        // Обновляем текст в объекте
         reminder.text = newText
-
-        // Обновляем в базе данных
         val values = ContentValues().apply {
             put(DatabaseHelper.COLUMN_TEXT, newText)
         }
@@ -59,8 +111,6 @@ class RemindersViewModel : ViewModel() {
         if (!reminder.isCompleted && !Utils.isReminderInPast(reminder.date, reminder.time)) {
             scheduleNotificationWithSettings(context, reminder)
         }
-
-        // Обновляем в списке reminders
         val index = reminders.indexOf(reminder)
         if (index != -1) {
             reminders[index] = reminder.copy(text = newText, isCompleted = reminder.isCompleted)
@@ -69,16 +119,21 @@ class RemindersViewModel : ViewModel() {
         sortReminders()
         Toast.makeText(context, R.string.toast_task_updated, Toast.LENGTH_LONG).show()
     }
-
+    /**
+     * Редактирует текст существующей подзадачи.
+     *
+     * @param reminder Родительское напоминание
+     * @param subTask Подзадача для редактирования
+     * @param newText Новый текст подзадачи
+     * @param context Контекст приложения
+     *
+     * @author Грехов М.В.
+     * @since 2.1.0
+     */
     fun editSubTaskText(reminder: Reminder, subTask: SubTask, newText: String, context: Context) {
         if (newText.isBlank()) return
-
-        // Отменяем старые уведомления подзадачи
         cancelNotification(context, subTask.id)
-
-
         subTask.text = newText
-
 
         val values = ContentValues().apply {
             put(DatabaseHelper.COLUMN_SUBTASK_TEXT, newText)
@@ -104,7 +159,17 @@ class RemindersViewModel : ViewModel() {
         sortReminders()
         Toast.makeText(context, R.string.toast_subtask_updated, Toast.LENGTH_LONG).show()
     }
-
+    /**
+     * Добавляет новое напоминание.
+     *
+     * Проверяет корректность даты и времени (нельзя установить время в прошлом),
+     * сохраняет задачу в базу данных и планирует уведомление.
+     *
+     * @param context Контекст приложения
+     *
+     * @author Грехов М.В., Яньшина А.Ю.
+     * @since 1.0.0
+     */
     fun addReminder(context: Context) {
         // Проверяем, заполнена ли дата и время
         if (date.isEmpty() && time.isEmpty()) {
@@ -117,8 +182,7 @@ class RemindersViewModel : ViewModel() {
 
         val finalDate = if (date.isEmpty()) Utils.getCurrentDate() else date
         val finalTime = if (time.isEmpty()) "12:00" else time
-
-        // ФИНАЛЬНАЯ ПРОВЕРКА: если дата сегодня, проверяем что время не в прошлом
+        // Проверка: нельзя установить время в прошлом (добавлено в версии 1.2.1)
         if (isTodayForMain(finalDate)) {
             val currentCalendar = Calendar.getInstance()
             val currentHour = currentCalendar.get(Calendar.HOUR_OF_DAY)
@@ -128,10 +192,9 @@ class RemindersViewModel : ViewModel() {
             val selectedHour = timeParts[0].toInt()
             val selectedMinute = timeParts[1].toInt()
 
-            // Если время уже прошло
             if (selectedHour < currentHour || (selectedHour == currentHour && selectedMinute < currentMinute)) {
                 Toast.makeText(context, R.string.time_cannot_be_past, Toast.LENGTH_LONG).show()
-                return  // Не создаем задачу
+                return
             }
         }
 
@@ -177,7 +240,15 @@ class RemindersViewModel : ViewModel() {
         Toast.makeText(context, R.string.toast_task_created, Toast.LENGTH_LONG).show()
     }
 
-
+    /**
+     * Добавляет новую подзадачу к существующему напоминанию.
+     *
+     * @param context Контекст приложения
+     * @param parentReminder Родительское напоминание
+     *
+     * @author Яньшина А.Ю.
+     * @since 1.2.0
+     */
     fun addSubTask(context: Context, parentReminder: Reminder) {
         if (subTaskDate.isEmpty() && subTaskTime.isEmpty()) {
             Toast.makeText(context, R.string.toast_datetime_error, Toast.LENGTH_LONG).show()
@@ -235,7 +306,18 @@ class RemindersViewModel : ViewModel() {
         sortReminders()
         Toast.makeText(context, R.string.toast_subtask_created, Toast.LENGTH_LONG).show()
     }
-
+    /**
+     * Переключает статус выполнения напоминания (выполнено/не выполнено).
+     *
+     * При выполнении задачи отменяет уведомление.
+     * При снятии отметки планирует новое уведомление, если время не прошло.
+     *
+     * @param reminder Напоминание для переключения
+     * @param context Контекст приложения
+     *
+     * @author Яньшина А.Ю.
+     * @since 1.2.0
+     */
     fun toggleReminderCompletion(reminder: Reminder, context: Context) {
         reminder.isCompleted = !reminder.isCompleted
         val values = ContentValues().apply {
@@ -262,7 +344,16 @@ class RemindersViewModel : ViewModel() {
             reminders[index] = reminder.copy(isCompleted = reminder.isCompleted)
         }
     }
-
+    /**
+     * Переключает статус выполнения подзадачи.
+     *
+     * @param reminder Родительское напоминание
+     * @param subTask Подзадача для переключения
+     * @param context Контекст приложения
+     *
+     * @author Яньшина А.Ю.
+     * @since 1.2.0
+     */
     fun toggleSubTaskCompletion(reminder: Reminder, subTask: SubTask, context: Context) {
         subTask.isCompleted = !subTask.isCompleted
         val values = ContentValues().apply {
@@ -288,7 +379,15 @@ class RemindersViewModel : ViewModel() {
             reminder.subTasks[index] = subTask.copy(isCompleted = subTask.isCompleted)
         }
     }
-
+    /**
+     * Удаляет напоминание и все его подзадачи.
+     *
+     * @param reminder Напоминание для удаления
+     * @param context Контекст приложения
+     *
+     * @author Грехов М.В., Яньшина А.Ю.
+     * @since 1.0.0
+     */
     fun removeReminder(reminder: Reminder, context: Context) {
         reminders.remove(reminder)
         dbHelper.writableDatabase?.delete(
@@ -299,7 +398,15 @@ class RemindersViewModel : ViewModel() {
         cancelNotification(context, reminder.id)
         Toast.makeText(context, R.string.toast_task_removed, Toast.LENGTH_LONG).show()
     }
-
+    /**
+     * Удаляет напоминание и все его подзадачи.
+     *
+     * @param reminder Напоминание для удаления
+     * @param context Контекст приложения
+     *
+     * @author Грехов М.В., Яньшина А.Ю.
+     * @since 1.0.0
+     */
     fun removeSubTask(reminder: Reminder, subTask: SubTask, context: Context) {
         reminder.subTasks.remove(subTask)
         dbHelper.writableDatabase?.delete(
@@ -310,7 +417,19 @@ class RemindersViewModel : ViewModel() {
         cancelNotification(context, subTask.id)
         Toast.makeText(context, R.string.toast_subtask_removed, Toast.LENGTH_LONG).show()
     }
+    // ==================== Загрузка данных из БД ====================
 
+    /**
+     * Загружает все напоминания из базы данных.
+     *
+     * Также загружает подзадачи для каждого напоминания,
+     * планирует активные уведомления и удаляет выполненные просроченные задачи.
+     *
+     * @param context Контекст приложения
+     *
+     * @author Грехов М.В., Яньшина А.Ю.
+     * @since 1.0.0
+     */
     fun getReminders(context: Context) {
         try {
             reminders.clear()
@@ -387,7 +506,7 @@ class RemindersViewModel : ViewModel() {
                         loadSubTasks(reminder, context)
 
                         val isPast = Utils.isReminderInPast(date, time)
-
+// Автоматическое удаление выполненных просроченных задач (добавлено в версии 1.2.2)
                         if (isCompleted && isPast) {
                             val hasActiveSubTasks = reminder.subTasks.any { !it.isCompleted }
                             if (!hasActiveSubTasks) {
@@ -418,7 +537,17 @@ class RemindersViewModel : ViewModel() {
             android.util.Log.e("RemindersViewModel", "Error loading reminders", e)
         }
     }
-
+    /**
+     * Очищает выполненные и просроченные напоминания.
+     *
+     * Выполненные задачи с истекшим дедлайном и без активных подзадач
+     * автоматически удаляются из базы данных.
+     *
+     * @param context Контекст приложения
+     *
+     * @author Яньшина А.Ю.
+     * @since 1.2.2
+     */
     fun cleanExpiredCompletedReminders(context: Context) {
         val remindersToRemove = reminders.filter { reminder ->
             reminder.isCompleted &&
@@ -440,7 +569,15 @@ class RemindersViewModel : ViewModel() {
             }
         }
     }
-
+    /**
+     * Загружает подзадачи для указанного напоминания из базы данных.
+     *
+     * @param reminder Напоминание, для которого загружаются подзадачи
+     * @param context Контекст приложения
+     *
+     * @author Яньшина А.Ю.
+     * @since 1.2.0
+     */
     private fun loadSubTasks(reminder: Reminder, context: Context) {
         val cursor = dbHelper.readableDatabase?.query(
             DatabaseHelper.TABLE_SUBTASKS,
@@ -532,7 +669,17 @@ class RemindersViewModel : ViewModel() {
             }
         }
     }
+    // ==================== Сортировка ====================
 
+    /**
+     * Сортирует список напоминаний и подзадач.
+     *
+     * Сортировка происходит сначала по приоритету (HIGH > MEDIUM > LOW),
+     * затем по дате и времени (ближайшие задачи выше).
+     *
+     * @author Грехов М.В. (приоритеты), Яньшина А.Ю. (подзадачи)
+     * @since 1.1.0 (приоритеты), 1.2.0 (сортировка подзадач)
+     */
     fun sortReminders() {
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
         reminders.sortWith(compareByDescending<Reminder> { Utils.getPriorityValue(it.priority) }
@@ -555,7 +702,22 @@ class RemindersViewModel : ViewModel() {
                 })
         }
     }
+    // ==================== Управление уведомлениями ====================
 
+    /**
+     * Планирует уведомление для напоминания с учётом настроек повторения.
+     *
+     * Поддерживает три типа повтора:
+     * - ONCE: однократное уведомление
+     * - DAILY: ежедневное уведомление
+     * - WEEKLY: еженедельное уведомление по выбранным дням
+     *
+     * @param context Контекст приложения
+     * @param reminder Напоминание для планирования
+     *
+     * @author Яньшина А.Ю.
+     * @since 2.0.0
+     */
     fun scheduleNotificationWithSettings(context: Context, reminder: Reminder) {
         if (reminder.isCompleted || Utils.isReminderInPast(reminder.date, reminder.time)) {
             return
@@ -575,7 +737,15 @@ class RemindersViewModel : ViewModel() {
             }
         }
     }
-
+    /**
+     * Планирует уведомление для подзадачи с учётом настроек повторения.
+     *
+     * @param context Контекст приложения
+     * @param subTask Подзадача для планирования
+     *
+     * @author Яньшина А.Ю.
+     * @since 2.0.0
+     */
     fun scheduleNotificationWithSettings(context: Context, subTask: SubTask) {
         if (subTask.isCompleted || Utils.isReminderInPast(subTask.date, subTask.time)) {
             return
@@ -595,7 +765,19 @@ class RemindersViewModel : ViewModel() {
             }
         }
     }
-
+    /**
+     * Планирует однократное уведомление.
+     *
+     * @param context Контекст приложения
+     * @param id ID уведомления
+     * @param text Текст уведомления
+     * @param date Дата срабатывания
+     * @param time Время срабатывания
+     * @param settings Настройки уведомления
+     *
+     * @author Яньшина А.Ю.
+     * @since 2.0.0
+     */
     private fun scheduleSingleNotification(context: Context, id: Int, text: String, date: String, time: String, settings: NotificationSettings) {
         val dateTime = "$date $time"
         val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
@@ -609,7 +791,18 @@ class RemindersViewModel : ViewModel() {
             scheduleRepeatedNotifications(context, id, text, triggerTime, settings)
         }
     }
-
+    /**
+     * Планирует ежедневные повторяющиеся уведомления.
+     *
+     * @param context Контекст приложения
+     * @param id ID уведомления
+     * @param text Текст уведомления
+     * @param time Время срабатывания (HH:mm)
+     * @param settings Настройки уведомления
+     *
+     * @author Яньшина А.Ю.
+     * @since 2.0.0
+     */
     private fun scheduleDailyNotifications(context: Context, id: Int, text: String, time: String, settings: NotificationSettings) {
         val calendar = java.util.Calendar.getInstance()
         val timeParts = time.split(":")
@@ -624,7 +817,20 @@ class RemindersViewModel : ViewModel() {
 
         scheduleRepeatingNotification(context, id, text, triggerTime, 24 * 60 * 60 * 1000, settings)
     }
-
+    /**
+     * Планирует еженедельные повторяющиеся уведомления.
+     *
+     * Уведомления планируются на каждый выбранный день недели.
+     *
+     * @param context Контекст приложения
+     * @param id ID уведомления
+     * @param text Текст уведомления
+     * @param time Время срабатывания (HH:mm)
+     * @param settings Настройки уведомления (содержит выбранные дни)
+     *
+     * @author Яньшина А.Ю.
+     * @since 2.0.0
+     */
     private fun scheduleWeeklyNotifications(context: Context, id: Int, text: String, time: String, settings: NotificationSettings) {
         val timeParts = time.split(":")
 
@@ -643,7 +849,19 @@ class RemindersViewModel : ViewModel() {
             scheduleRepeatingNotification(context, id, text, triggerTime, 7 * 24 * 60 * 60 * 1000, settings)
         }
     }
-
+    /**
+     * Планирует повторяющееся уведомление с указанным интервалом.
+     *
+     * @param context Контекст приложения
+     * @param id ID уведомления
+     * @param text Текст уведомления
+     * @param triggerTime Время первого срабатывания
+     * @param interval Интервал между срабатываниями в миллисекундах
+     * @param settings Настройки уведомления
+     *
+     * @author Яньшина А.Ю.
+     * @since 2.0.0
+     */
     private fun scheduleRepeatingNotification(context: Context, id: Int, text: String, triggerTime: Long, interval: Long, settings: NotificationSettings) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val pendingIntent = Utils.getPendingIntentWithSettings(context, id, text, settings)
@@ -656,6 +874,18 @@ class RemindersViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Планирует однократное точное уведомление.
+     *
+     * @param context Контекст приложения
+     * @param id ID уведомления
+     * @param text Текст уведомления
+     * @param triggerTime Время срабатывания в миллисекундах
+     * @param settings Настройки уведомления
+     *
+     * @author Яньшина А.Ю.
+     * @since 2.0.0
+     */
     private fun scheduleNotification(context: Context, id: Int, text: String, triggerTime: Long, settings: NotificationSettings) {
         // Логируем перед отправкой
         android.util.Log.d("RemindersViewModel", "Scheduling notification with sound: ${settings.soundUri}")
@@ -670,7 +900,21 @@ class RemindersViewModel : ViewModel() {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         }
     }
-
+    /**
+     * Планирует повторяющиеся уведомления (дополнительные повторы).
+     *
+     * Используется для создания нескольких уведомлений с интервалом
+     * после основного (например, напоминание через 5, 10, 15 минут).
+     *
+     * @param context Контекст приложения
+     * @param id ID уведомления
+     * @param text Текст уведомления
+     * @param firstTriggerTime Время первого срабатывания
+     * @param settings Настройки уведомления (содержит количество повторов и интервал)
+     *
+     * @author Яньшина А.Ю.
+     * @since 2.0.0
+     */
     private fun scheduleRepeatedNotifications(context: Context, id: Int, text: String, firstTriggerTime: Long, settings: NotificationSettings) {
         for (i in 1..settings.repeatCount) {
             val repeatTime = firstTriggerTime + (i * settings.repeatIntervalMinutes * 60 * 1000)
@@ -688,6 +932,17 @@ class RemindersViewModel : ViewModel() {
             }
         }
     }
+    /**
+     * Проверяет, является ли указанная дата сегодняшним днём.
+     *
+     * Используется для валидации времени при создании задач.
+     *
+     * @param date Дата в формате dd.MM.yyyy
+     * @return true, если дата совпадает с сегодняшней
+     *
+     * @author Грехов М.В.
+     * @since 1.2.1
+     */
     private fun isTodayForMain(date: String): Boolean {
         if (date.isEmpty()) return false
 
@@ -712,7 +967,15 @@ class RemindersViewModel : ViewModel() {
             return false
         }
     }
-
+    /**
+     * Отменяет запланированное уведомление.
+     *
+     * @param context Контекст приложения
+     * @param id ID уведомления для отмены
+     *
+     * @author Грехов М.В., Яньшина А.Ю.
+     * @since 1.0.0
+     */
     fun cancelNotification(context: Context, id: Int) {
         val pendingIntent = Utils.getPendingIntent(context, id, "")
         alarmManager.cancel(pendingIntent)

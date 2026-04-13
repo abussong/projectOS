@@ -3,8 +3,6 @@ package com.example.remindmind
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +16,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/**
+ * Компонент отображения одного напоминания в списке.
+ *
+ * Содержит чекбокс выполнения, текст задачи, дату, время, приоритет,
+ * кнопки добавления подзадачи, удаления и раскрытия списка подзадач.
+ *
+ * @param reminder Напоминание для отображения
+ * @param viewModel ViewModel для управления данными
+ * @param onAddSubTask Callback для открытия диалога добавления подзадачи
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ * @version 2.1.0 (добавлено редактирование текста по клику)
+ */
 @Composable
 fun ReminderItem(
     reminder: Reminder,
@@ -72,6 +84,7 @@ fun ReminderItem(
                         )
                     )
 
+                    // Область текста задачи с возможностью редактирования (добавлено в версии 2.1.0)
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -93,6 +106,7 @@ fun ReminderItem(
                 }
 
                 Row {
+                    // Кнопка добавления подзадачи (добавлена в версии 1.2.0)
                     IconButton(
                         onClick = onAddSubTask,
                         modifier = Modifier.size(32.dp)
@@ -100,6 +114,7 @@ fun ReminderItem(
                         Text(text = "+", color = colors.secondary, fontSize = 20.sp)
                     }
 
+                    // Кнопка удаления
                     IconButton(
                         onClick = { viewModel.removeReminder(reminder, context) },
                         modifier = Modifier.size(32.dp)
@@ -107,6 +122,7 @@ fun ReminderItem(
                         Text(text = "✕", color = colors.secondary, fontSize = 18.sp)
                     }
 
+                    // Кнопка раскрытия списка подзадач
                     IconButton(
                         onClick = { expanded = !expanded },
                         modifier = Modifier.size(32.dp)
@@ -120,6 +136,7 @@ fun ReminderItem(
                 }
             }
 
+            // Раскрывающийся список подзадач
             if (expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Divider(color = colors.border)
@@ -149,6 +166,7 @@ fun ReminderItem(
         }
     }
 
+    // Диалог редактирования текста задачи (добавлен в версии 2.1.0)
     if (showEditDialog) {
         EditReminderDialog(
             reminder = reminder,
@@ -161,6 +179,17 @@ fun ReminderItem(
     }
 }
 
+/**
+ * Компонент отображения одной подзадачи.
+ *
+ * @param subTask Подзадача для отображения
+ * @param reminder Родительское напоминание
+ * @param viewModel ViewModel для управления данными
+ *
+ * @author Яньшина А.Ю.
+ * @since 1.2.0
+ * @version 2.1.0 (добавлено редактирование текста по клику)
+ */
 @Composable
 fun SubTaskItem(
     subTask: SubTask,
@@ -230,6 +259,7 @@ fun SubTaskItem(
         }
     }
 
+    // Диалог редактирования текста подзадачи (добавлен в версии 2.1.0)
     if (showEditDialog) {
         EditSubTaskDialog(
             subTask = subTask,
@@ -243,6 +273,16 @@ fun SubTaskItem(
     }
 }
 
+/**
+ * Диалог редактирования текста напоминания.
+ *
+ * @param reminder Напоминание для редактирования
+ * @param onDismiss Callback закрытия диалога
+ * @param onSave Callback сохранения с новым текстом
+ *
+ * @author Максим (Грехов М.В.)
+ * @since 2.1.0
+ */
 @Composable
 fun EditReminderDialog(
     reminder: Reminder,
@@ -293,6 +333,17 @@ fun EditReminderDialog(
     )
 }
 
+/**
+ * Диалог редактирования текста подзадачи.
+ *
+ * @param subTask Подзадача для редактирования
+ * @param reminder Родительское напоминание
+ * @param onDismiss Callback закрытия диалога
+ * @param onSave Callback сохранения с новым текстом
+ *
+ * @author Максим (Грехов М.В.)
+ * @since 2.1.0
+ */
 @Composable
 fun EditSubTaskDialog(
     subTask: SubTask,
@@ -344,6 +395,16 @@ fun EditSubTaskDialog(
     )
 }
 
+/**
+ * Индикатор приоритета задачи (цветной кружок + текст).
+ *
+ * @param priority Приоритет задачи
+ * @param colors Цветовая схема
+ * @param small Уменьшенный размер для подзадач
+ *
+ * @author Грехов М.В.
+ * @since 1.1.0
+ */
 @Composable
 fun PriorityIndicator(priority: Priority, colors: AppColors, small: Boolean = false) {
     val color = when (priority) {

@@ -15,10 +15,36 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
+/**
+ * BroadcastReceiver для отображения уведомлений о напоминаниях.
+ *
+ * Получает Intent от AlarmManager, воспроизводит выбранный пользователем звук
+ * через MediaPlayer (обход ограничений канала уведомлений), управляет вибрацией
+ * и отображает уведомление в статус-баре.
+ *
+ * @author Яньшина А.Ю. (реализация кастомизации звука через MediaPlayer)
+ * @since 1.0.0 (базовые уведомления), 2.0.0 (кастомизация звука)
+ * @version 2.0.0
+ */
 class ReminderBroadcastReceiver : BroadcastReceiver() {
+    /** MediaPlayer для воспроизведения пользовательского звука */
     private var mediaPlayer: MediaPlayer? = null
+
+    /** WakeLock для предотвращения засыпания устройства во время воспроизведения */
     private var wakeLock: PowerManager.WakeLock? = null
 
+    /**
+     * Вызывается при срабатывании будильника.
+     *
+     * Воспроизводит звук (выбранный пользователем или стандартный),
+     * управляет вибрацией и показывает уведомление.
+     *
+     * @param context Контекст приложения
+     * @param intent Intent с данными о напоминании (текст, ID, звук, вибрация)
+     *
+     * @author Яньшина А.Ю.
+     * @since 1.0.0
+     */
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null) {
             // Приобретаем WakeLock, чтобы устройство не уснуло во время воспроизведения звука
@@ -41,7 +67,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
 
             android.util.Log.d("ReminderBroadcast", "Received sound URI: $soundUriString")
 
-            // Воспроизводим звук через MediaPlayer
+            // Воспроизводим звук через MediaPlayer (обход ограничений канала)
             try {
                 val soundUri: Uri? = if (!soundUriString.isNullOrEmpty()) {
                     try {
@@ -62,7 +88,6 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
                         setOnCompletionListener {
                             release()
                             mediaPlayer = null
-                            // Освобождаем WakeLock после воспроизведения
                             wakeLock?.let {
                                 if (it.isHeld) it.release()
                                 wakeLock = null
@@ -79,7 +104,6 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
                         setOnCompletionListener {
                             release()
                             mediaPlayer = null
-                            // Освобождаем WakeLock после воспроизведения
                             wakeLock?.let {
                                 if (it.isHeld) it.release()
                                 wakeLock = null
@@ -90,7 +114,6 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
                 }
             } catch (e: Exception) {
                 android.util.Log.e("ReminderBroadcast", "Error playing sound: ${e.message}")
-                // Если не удалось воспроизвести выбранный звук, пробуем стандартный
                 try {
                     mediaPlayer = MediaPlayer().apply {
                         setDataSource(context, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
@@ -114,7 +137,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
                 }
             }
 
-            // Вибрация
+            // Вибрация (если включена в настройках)
             if (isVibrationEnabled) {
                 try {
                     val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -136,7 +159,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
                 }
             }
 
-            // Показываем уведомление (без звука, так как мы уже воспроизвели его)
+            // Проверка разрешения на уведомления для Android 13+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 if (ActivityCompat.checkSelfPermission(
                         context,
@@ -148,6 +171,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
                 }
             }
 
+            // Отображаем уведомление в статус-баре (без звука, так как звук уже воспроизведён)
             val notificationManager = NotificationManagerCompat.from(context)
             val builder = NotificationCompat.Builder(context, ReminderApplication.channelId)
                 .setSmallIcon(R.drawable.ic_notification)

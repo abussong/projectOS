@@ -1,30 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ============================================================================
+  Ресурсы строк приложения RemindMind
+  ============================================================================
+  Версия: 2.0
+  Авторы: Грехов М.В., Яньшина А.Ю.
+
+  Описание: Все текстовые строки, используемые в приложении.
+           Поддерживается русский язык.
+  ============================================================================
+-->
 <resources>
+    <!-- ==================== ОСНОВНЫЕ НАЗВАНИЯ ==================== -->
     <string name="app_name">remindmind</string>
     <string name="app_title">remindmind</string>
+
+    <!-- ==================== РАЗРЕШЕНИЯ И ПРЕДУПРЕЖДЕНИЯ ==================== -->
     <string name="permission_warning">Без разрешения на отправку уведомлений вы не будете получать напоминания!</string>
+
+    <!-- ==================== ФОРМА СОЗДАНИЯ ЗАДАЧИ ==================== -->
     <string name="form_title">Создать задачу</string>
     <string name="form_text_hint">Введите текст задачи</string>
     <string name="form_date_hint">Выберите дату</string>
     <string name="form_time_hint">Выберите время</string>
     <string name="form_create">Создать</string>
+
+    <!-- ==================== СООБЩЕНИЯ ОБ ОШИБКАХ ==================== -->
     <string name="toast_datetime_error">Выберите дату или время!</string>
     <string name="toast_text_error">Введите текст задачи!</string>
     <string name="time_cannot_be_past">Нельзя выбрать прошедшее время</string>
 
+    <!-- ==================== РЕДАКТИРОВАНИЕ ЗАДАЧ (v2.0) ==================== -->
     <string name="edit_task">Редактировать задачу</string>
     <string name="edit_subtask">Редактировать подзадачу</string>
     <string name="task_text">Текст задачи</string>
     <string name="subtask_text">Текст подзадачи</string>
     <string name="save">Сохранить</string>
+
+    <!-- ==================== TOAST-СООБЩЕНИЯ ОБ ОПЕРАЦИЯХ ==================== -->
     <string name="toast_task_updated">Задача обновлена</string>
     <string name="toast_subtask_updated">Подзадача обновлена</string>
     <string name="toast_task_created">Новая задача добавлена!</string>
     <string name="toast_task_removed">Задача была удалена!</string>
-    <string name="new_task">Новое напоминание!</string>
     <string name="toast_subtask_created">Подзадача создана!</string>
     <string name="toast_subtask_removed">Подзадача удалена!</string>
-    //для тем
+
+    <!-- ==================== УВЕДОМЛЕНИЯ ==================== -->
+    <string name="new_task">Новое напоминание!</string>
+
+    <!-- ==================== НАСТРОЙКИ ТЕМ ==================== -->
     <string name="settings_title">Настройки</string>
     <string name="theme_settings">Тема оформления</string>
     <string name="theme_light">Светлая</string>
@@ -32,24 +56,32 @@
     <string name="theme_navy">Темно-синяя</string>
     <string name="back">Назад</string>
 
+    <!-- ==================== ПОДЗАДАЧИ ==================== -->
     <string name="subtask_title">Создать подзадачу</string>
     <string name="subtask_text_hint">Введите подзадачу</string>
+    <string name="no_subtasks">Нет подзадач</string>
+
+    <!-- ==================== ПРИОРИТЕТЫ ==================== -->
     <string name="priority">Приоритет</string>
     <string name="priority_high">Высокий</string>
     <string name="priority_medium">Средний</string>
     <string name="priority_low">Низкий</string>
+
+    <!-- ==================== КНОПКИ ДИАЛОГОВ ==================== -->
     <string name="create">Создать</string>
     <string name="cancel">Отмена</string>
-    <string name="no_subtasks">Нет подзадач</string>
+    <string name="apply">Применить</string>
 
+    <!-- ==================== НАСТРОЙКИ УВЕДОМЛЕНИЙ ==================== -->
     <string name="configure_notification">Настроить уведомление</string>
-
     <string name="notification_settings_title">Настройки уведомления</string>
     <string name="repeat_period">Периодичность</string>
     <string name="repeat_once">Один раз</string>
     <string name="repeat_daily">Ежедневно</string>
     <string name="repeat_weekly">Еженедельно</string>
     <string name="select_days">Дни недели</string>
+
+    <!-- Короткие названия дней недели для чипов -->
     <string name="mon_short">Пн</string>
     <string name="tue_short">Вт</string>
     <string name="wed_short">Ср</string>
@@ -57,6 +89,8 @@
     <string name="fri_short">Пт</string>
     <string name="sat_short">Сб</string>
     <string name="sun_short">Вс</string>
+
+    <!-- Настройка звука уведомлений -->
     <string name="notification_sound">Звук уведомления</string>
     <string name="select_sound">Выбрать звук</string>
     <string name="select_sound_title">Выберите звук уведомления</string>
@@ -66,14 +100,17 @@
     <string name="reset_to_default">Сбросить на стандартный</string>
     <string name="reset_to_default_sound">Сброшено на стандартный звук</string>
     <string name="sound_selected">Звук выбран</string>
+
+    <!-- Настройка вибрации -->
     <string name="vibration">Вибрация</string>
+
+    <!-- Настройка повторов уведомлений -->
     <string name="notification_repeats">Повторы уведомления</string>
     <string name="repeat_count">Количество:</string>
     <string name="repeat_interval_minutes">Интервал (мин):</string>
     <string name="interval_hint">Минимум 1 минута, максимум 60 минут</string>
-    <string name="apply">Применить</string>
 
-    <!-- About section -->
+    <!-- ==================== О ПРИЛОЖЕНИИ ==================== -->
     <string name="about_section">О приложении</string>
     <string name="about_app">О приложении</string>
     <string name="app_version">Версия %s</string>

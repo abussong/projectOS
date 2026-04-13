@@ -20,7 +20,29 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-// Класс для хранения цветов темы
+/**
+ * Класс для хранения цветов темы оформления приложения.
+ *
+ * Содержит все необходимые цвета для различных элементов интерфейса:
+ * основные цвета, фоновые, текстовые, для градиентов и карточек.
+ *
+ * @property primary Основной цвет темы
+ * @property secondary Вторичный цвет (акцентный)
+ * @property background Цвет фона экранов
+ * @property surface Цвет поверхностей (карточек, диалогов)
+ * @property text Основной цвет текста
+ * @property textSecondary Вторичный цвет текста (для подписей)
+ * @property border Цвет границ элементов
+ * @property buttonGradientStart Начальный цвет градиента кнопок
+ * @property buttonGradientEnd Конечный цвет градиента кнопок
+ * @property cardBackground Цвет фона карточек задач
+ * @property statusBarColor Цвет строки состояния
+ * @property boxtext Цвет текста в полях ввода
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0 (базовые цвета), 1.2.1 (улучшение тем от Максима)
+ * @version 2.2.0
+ */
 @Stable
 class AppColors(
     val primary: Color,
@@ -37,7 +59,14 @@ class AppColors(
     val boxtext: Color
 )
 
-// Предопределенные темы
+/**
+ * Цветовая схема светлой темы.
+ *
+ * Использует белый фон и черный текст с акцентным бирюзовым цветом.
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 val LightThemeColors = AppColors(
     primary = white, // navy
     secondary = Color(0xFF000000), // teal_200
@@ -53,6 +82,14 @@ val LightThemeColors = AppColors(
     boxtext = Color(0xFF000000)// navy
 )
 
+/**
+ * Цветовая схема темной темы.
+ *
+ * Использует темно-серый фон и белый текст для комфортного использования в темноте.
+ *
+ * @author Грехов М.В. (улучшение тем)
+ * @since 1.2.1
+ */
 val DarkThemeColors = AppColors(
     primary = Color(0xFF121212), // navy
     secondary = white, // teal_200
@@ -68,6 +105,15 @@ val DarkThemeColors = AppColors(
     boxtext = white
 )
 
+/**
+ * Цветовая схема темно-синей (Navy) темы.
+ *
+ * Фирменная тема приложения с насыщенным синим фоном и бирюзовыми акцентами.
+ * Используется по умолчанию.
+ *
+ * @author Грехов М.В., Яньшина А.Ю. (база)
+ * @since 1.0.0 (базовая), 1.2.1 (улучшенная)
+ */
 val NavyThemeColors = AppColors(
     primary = Color(0xFF242B5F), // navy
     secondary = Color(0xFF03DAC5), // teal_200
@@ -83,17 +129,42 @@ val NavyThemeColors = AppColors(
     boxtext = Color(0xFF03DAC5)
 )
 
-// Enum для типов тем
+/**
+ * Перечисление доступных типов тем оформления.
+ *
+ * @property LIGHT Светлая тема
+ * @property DARK Темная тема
+ * @property NAVY Темно-синяя тема (по умолчанию)
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 enum class ThemeType {
     LIGHT,
     DARK,
     NAVY
 }
 
-// CompositionLocal для передачи темы
+/**
+ * CompositionLocal для передачи текущей темы через Compose-дерево.
+ *
+ * Позволяет дочерним компонентам получать доступ к цветам текущей темы
+ * без явной передачи через параметры.
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 val LocalAppColors = staticCompositionLocalOf { LightThemeColors }
 
-// Функция для получения текущей темы
+/**
+ * Возвращает цветовую схему для указанного типа темы.
+ *
+ * @param themeType Тип темы (LIGHT, DARK, NAVY)
+ * @return Объект AppColors с цветами для выбранной темы
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @Composable
 fun getCurrentTheme(themeType: ThemeType): AppColors {
     return when (themeType) {
@@ -103,20 +174,55 @@ fun getCurrentTheme(themeType: ThemeType): AppColors {
     }
 }
 
-//DataStore для сохранения выбранной темы
+/**
+ * DataStore для сохранения выбранной темы.
+ *
+ * Использует Preferences DataStore для хранения настроек темы
+ * между запусками приложения.
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 private val Context.dataStore by preferencesDataStore("settings")
 
+/**
+ * Класс для управления настройками темы.
+ *
+ * Предоставляет Flow для отслеживания текущей темы и методы для её сохранения.
+ *
+ * @property context Контекст приложения для доступа к DataStore
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 class ThemePreferences(private val context: Context) {
     companion object {
         val THEME_KEY = stringPreferencesKey("theme")
     }
 
+    /**
+     * Flow с текущей выбранной темой.
+     *
+     * При изменении настроек темы Flow автоматически обновляется.
+     * По умолчанию возвращает NAVY тему.
+     *
+     * @author Грехов М.В., Яньшина А.Ю.
+     * @since 1.0.0
+     */
     val themeFlow: Flow<ThemeType> = context.dataStore.data
         .map { preferences ->
             val themeName = preferences[THEME_KEY] ?: ThemeType.NAVY.name
             ThemeType.valueOf(themeName)
         }
 
+    /**
+     * Сохраняет выбранную тему в DataStore.
+     *
+     * @param theme Тип темы для сохранения
+     *
+     * @author Грехов М.В., Яньшина А.Ю.
+     * @since 1.0.0
+     */
     suspend fun saveTheme(theme: ThemeType) {
         context.dataStore.edit { preferences ->
             preferences[THEME_KEY] = theme.name

@@ -29,6 +29,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import java.util.Calendar
 
+/**
+ * Форма создания нового напоминания.
+ *
+ * Содержит поля для ввода текста, выбора приоритета, даты и времени,
+ * а также кнопку для настройки уведомлений.
+ *
+ * @param viewModel ViewModel для управления данными
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ * @version 2.0.0
+ */
 @Composable
 fun Form(viewModel: RemindersViewModel = viewModel()) {
     val colors = LocalAppColors.current
@@ -58,6 +70,7 @@ fun Form(viewModel: RemindersViewModel = viewModel()) {
         PrioritySelectorComponent(viewModel)
         DateTimeInputFieldsComponent(viewModel)
 
+        // Кнопка настройки уведомлений (добавлена в версии 2.0.0)
         Button(
             onClick = { showNotificationSettings = true },
             modifier = Modifier
@@ -75,10 +88,11 @@ fun Form(viewModel: RemindersViewModel = viewModel()) {
         }
 
         CreateButtonComponent {
-            viewModel.addReminder(context)  // Проверка будет внутри метода
+            viewModel.addReminder(context)
         }
     }
 
+    // Диалог настроек уведомлений (добавлен в версии 2.0.0)
     if (showNotificationSettings) {
         NotificationSettingsDialog(
             currentSettings = viewModel.tempNotificationSettings,
@@ -90,6 +104,14 @@ fun Form(viewModel: RemindersViewModel = viewModel()) {
     }
 }
 
+/**
+ * Поле ввода текста напоминания.
+ *
+ * @param viewModel ViewModel для управления данными
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReminderTextField(viewModel: RemindersViewModel) {
@@ -117,6 +139,14 @@ fun ReminderTextField(viewModel: RemindersViewModel) {
     )
 }
 
+/**
+ * Компонент выбора приоритета задачи.
+ *
+ * @param viewModel ViewModel для управления данными
+ *
+ * @author Грехов М.В.
+ * @since 1.1.0
+ */
 @Composable
 fun PrioritySelectorComponent(viewModel: RemindersViewModel) {
     val colors = LocalAppColors.current
@@ -171,6 +201,14 @@ fun PrioritySelectorComponent(viewModel: RemindersViewModel) {
     }
 }
 
+/**
+ * Компонент для ввода даты и времени (группирует DateInputFieldComponent и TimeInputFieldComponent).
+ *
+ * @param viewModel ViewModel для управления данными
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @Composable
 fun DateTimeInputFieldsComponent(viewModel: RemindersViewModel) {
     Column(
@@ -185,6 +223,14 @@ fun DateTimeInputFieldsComponent(viewModel: RemindersViewModel) {
     }
 }
 
+/**
+ * Поле выбора даты с календарём.
+ *
+ * @param viewModel ViewModel для управления данными
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateInputFieldComponent(viewModel: RemindersViewModel) {
@@ -200,7 +246,7 @@ fun DateInputFieldComponent(viewModel: RemindersViewModel) {
         { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
             val newDate = "${Utils.addZero(selectedDay)}.${Utils.addZero(selectedMonth + 1)}.$selectedYear"
 
-            // Проверяем и очищаем время если нужно
+            // Проверяем и очищаем время если нужно (добавлено в версии 2.0.1)
             if (viewModel.time.isNotEmpty() && isTodayForMain(newDate)) {
                 val currentTime = Calendar.getInstance()
                 val selectedHour = viewModel.time.split(":")[0].toInt()
@@ -209,7 +255,7 @@ fun DateInputFieldComponent(viewModel: RemindersViewModel) {
                 if (selectedHour < currentTime.get(Calendar.HOUR_OF_DAY) ||
                     (selectedHour == currentTime.get(Calendar.HOUR_OF_DAY) &&
                             selectedMinute < currentTime.get(Calendar.MINUTE))) {
-                    viewModel.time = ""  // Просто очищаем поле времени
+                    viewModel.time = ""
                 }
             }
 
@@ -248,6 +294,14 @@ fun DateInputFieldComponent(viewModel: RemindersViewModel) {
     }
 }
 
+/**
+ * Поле выбора времени с таймпикером.
+ *
+ * @param viewModel ViewModel для управления данными
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimeInputFieldComponent(viewModel: RemindersViewModel) {
@@ -327,6 +381,17 @@ fun TimeInputFieldComponent(viewModel: RemindersViewModel) {
     }
 }
 
+/**
+ * Проверяет, можно ли установить указанное время для заданной даты.
+ *
+ * @param date Дата в формате dd.MM.yyyy
+ * @param hour Выбранный час
+ * @param minute Выбранная минута
+ * @return true, если время допустимо (не в прошлом)
+ *
+ * @author Грехов М.В.
+ * @since 1.2.1
+ */
 private fun isTimeValidForMain(date: String, hour: Int, minute: Int): Boolean {
     if (date.isEmpty()) return false
 
@@ -347,6 +412,15 @@ private fun isTimeValidForMain(date: String, hour: Int, minute: Int): Boolean {
     return true
 }
 
+/**
+ * Проверяет, является ли указанная дата сегодняшним днём.
+ *
+ * @param date Дата в формате dd.MM.yyyy
+ * @return true, если дата совпадает с сегодняшней
+ *
+ * @author Грехов М.В.
+ * @since 1.2.1
+ */
 private fun isTodayForMain(date: String): Boolean {
     if (date.isEmpty()) return false
 
@@ -370,6 +444,14 @@ private fun isTodayForMain(date: String): Boolean {
     return false
 }
 
+/**
+ * Кнопка создания задачи.
+ *
+ * @param onClick Callback при нажатии кнопки
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @Composable
 fun CreateButtonComponent(onClick: () -> Unit) {
     val colors = LocalAppColors.current

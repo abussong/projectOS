@@ -20,6 +20,23 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import android.widget.Toast
 
+/**
+ * Диалог настройки уведомлений для задачи или подзадачи.
+ *
+ * Позволяет настроить:
+ * - Периодичность (один раз, ежедневно, еженедельно)
+ * - Дни недели для еженедельного повтора
+ * - Звук уведомления (выбор из системных)
+ * - Вибрацию (вкл/выкл)
+ * - Количество и интервал дополнительных повторов
+ *
+ * @param currentSettings Текущие настройки уведомления
+ * @param onSettingsChanged Callback при изменении настроек
+ * @param onDismiss Callback закрытия диалога
+ *
+ * @author Яньшина А.Ю.
+ * @since 2.0.0
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationSettingsDialog(
@@ -30,7 +47,7 @@ fun NotificationSettingsDialog(
     val colors = LocalAppColors.current
     val context = LocalContext.current
 
-    // Получаем все строки заранее в самом начале Composable функции
+    // Получаем строки из ресурсов
     val soundSelectedMsg = stringResource(R.string.sound_selected)
     val resetToDefaultMsg = stringResource(R.string.reset_to_default_sound)
     val selectSoundTitle = stringResource(R.string.select_sound_title)
@@ -51,6 +68,7 @@ fun NotificationSettingsDialog(
         uiUpdateTrigger++
     }
 
+    // Лаунчер для выбора звука из системного пикера
     val soundPickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -82,6 +100,7 @@ fun NotificationSettingsDialog(
                         .heightIn(max = 500.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    // ==================== Выбор периодичности ====================
                     item {
                         Text(
                             text = stringResource(R.string.repeat_period),
@@ -159,6 +178,7 @@ fun NotificationSettingsDialog(
                         }
                     }
 
+                    // ==================== Выбор дней недели (для еженедельного повтора) ====================
                     if (repeatType == RepeatType.WEEKLY) {
                         item(key = "weekly_days_$uiUpdateTrigger") {
                             Card(
@@ -177,7 +197,7 @@ fun NotificationSettingsDialog(
                                         fontSize = 14.sp
                                     )
 
-                                    // Дни недели в две строки, используем минимальную ширину
+                                    // Первая строка: Пн, Вт, Ср, Чт
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -215,6 +235,7 @@ fun NotificationSettingsDialog(
                                         }
                                     }
 
+                                    // Вторая строка: Пт, Сб, Вс
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -255,6 +276,7 @@ fun NotificationSettingsDialog(
                         }
                     }
 
+                    // ==================== Выбор звука ====================
                     item(key = "sound_section_$selectedSoundUri") {
                         Text(
                             text = stringResource(R.string.notification_sound),
@@ -306,6 +328,7 @@ fun NotificationSettingsDialog(
                         }
                     }
 
+                    // ==================== Вибрация ====================
                     item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -327,6 +350,7 @@ fun NotificationSettingsDialog(
                         }
                     }
 
+                    // ==================== Повторы уведомления ====================
                     item {
                         Text(
                             text = stringResource(R.string.notification_repeats),

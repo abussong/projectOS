@@ -35,13 +35,41 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 
+/**
+ * Главное Activity приложения.
+ *
+ * Отвечает за отображение списка напоминаний, формы создания новых задач
+ * и управление разрешениями на уведомления и точные будильники.
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ * @version 2.2.0
+ */
 class MainActivity : ComponentActivity() {
+
+    /**
+     * Лаунчер для запроса разрешения на отправку уведомлений (Android 13+).
+     *
+     * @author Грехов М.В., Яньшина А.Ю.
+     * @since 1.0.0
+     */
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (!isGranted) {
             Toast.makeText(this, R.string.permission_warning, Toast.LENGTH_LONG).show()
         }
     }
 
+    /**
+     * Вызывается при создании Activity.
+     *
+     * Инициализирует UI, проверяет разрешения на уведомления и точные будильники,
+     * настраивает тему и загружает напоминания из базы данных.
+     *
+     * @param savedInstanceState Сохраненное состояние Activity или null
+     *
+     * @author Грехов М.В., Яньшина А.Ю.
+     * @since 1.0.0
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,12 +77,14 @@ class MainActivity : ComponentActivity() {
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+        // Запрос разрешения на уведомления для Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
             && !NotificationManagerCompat.from(this).areNotificationsEnabled()
         ) {
             requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
 
+        // Запрос разрешения на точные будильники для Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
             && !alarmManager.canScheduleExactAlarms()
         ) {
@@ -80,7 +110,6 @@ class MainActivity : ComponentActivity() {
                     viewModel.dbHelper = DatabaseHelper(context)
                     viewModel.alarmManager = alarmManager
                     viewModel.getReminders(context)
-                    //Очищаем просроченные задачи
                     delay(1000)
                     viewModel.cleanExpiredCompletedReminders(context)
                 }
@@ -104,6 +133,17 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Основной экран приложения.
+ *
+ * Содержит заголовок, форму создания задач и список напоминаний.
+ *
+ * @param viewModel ViewModel для управления данными
+ * @param onSettingsClick Callback для открытия экрана настроек
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @Composable
 fun MainScreenContent(
     viewModel: RemindersViewModel,
@@ -112,7 +152,6 @@ fun MainScreenContent(
     val colors = LocalAppColors.current
     var selectedReminder by remember { mutableStateOf<Reminder?>(null) }
 
-    // Добавляем наблюдение за изменениями в списке
     val reminders by remember { derivedStateOf { viewModel.reminders.toList() } }
 
     LaunchedEffect(selectedReminder) {
@@ -181,6 +220,12 @@ fun MainScreenContent(
     }
 }
 
+/**
+ * Заголовок приложения.
+ *
+ * @author Грехов М.В., Яньшина А.Ю.
+ * @since 1.0.0
+ */
 @Composable
 fun AppTitleText() {
     val colors = LocalAppColors.current

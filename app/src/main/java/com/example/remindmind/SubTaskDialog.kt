@@ -15,11 +15,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Calendar
 
+/**
+ * Диалог создания новой подзадачи.
+ *
+ * Позволяет ввести текст подзадачи, выбрать приоритет, дату и время,
+ * а также настроить уведомление для подзадачи.
+ *
+ * @param viewModel ViewModel для управления данными
+ * @param onDismiss Callback закрытия диалога
+ *
+ * @author Яньшина А.Ю.
+ * @since 1.2.0
+ * @version 2.0.0 (добавлены настройки уведомлений), 2.1.1 (исправлено закрытие окна при ошибке)
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubTaskDialog(
@@ -42,6 +54,7 @@ fun SubTaskDialog(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Поле ввода текста подзадачи
                 OutlinedTextField(
                     value = viewModel.subTaskText,
                     onValueChange = { viewModel.subTaskText = it },
@@ -55,6 +68,7 @@ fun SubTaskDialog(
                     )
                 )
 
+                // Выбор приоритета (добавлен в версии 1.2.0)
                 Text(
                     text = stringResource(id = R.string.priority),
                     color = colors.text,
@@ -84,9 +98,11 @@ fun SubTaskDialog(
                     )
                 }
 
+                // Выбор даты и времени
                 SubTaskDatePicker(viewModel)
                 SubTaskTimePicker(viewModel)
 
+                // Кнопка настройки уведомлений (добавлена в версии 2.0.0)
                 Button(
                     onClick = { showNotificationSettings = true },
                     modifier = Modifier.fillMaxWidth(),
@@ -123,6 +139,7 @@ fun SubTaskDialog(
         textContentColor = colors.text
     )
 
+    // Диалог настроек уведомлений для подзадачи (добавлен в версии 2.0.0)
     if (showNotificationSettings) {
         NotificationSettingsDialog(
             currentSettings = viewModel.subTaskNotificationSettings,
@@ -134,6 +151,17 @@ fun SubTaskDialog(
     }
 }
 
+/**
+ * Чип выбора приоритета для подзадачи.
+ *
+ * @param text Текст чипа
+ * @param isSelected Выбран ли чип
+ * @param onClick Callback при нажатии
+ * @param colors Цветовая схема
+ *
+ * @author Яньшина А.Ю.
+ * @since 1.2.0
+ */
 @Composable
 fun PriorityChipSubTask(
     text: String,
@@ -156,6 +184,14 @@ fun PriorityChipSubTask(
     }
 }
 
+/**
+ * Поле выбора даты для подзадачи.
+ *
+ * @param viewModel ViewModel для управления данными
+ *
+ * @author Яньшина А.Ю.
+ * @since 1.2.0
+ */
 @Composable
 fun SubTaskDatePicker(viewModel: RemindersViewModel) {
     val colors = LocalAppColors.current
@@ -179,7 +215,7 @@ fun SubTaskDatePicker(viewModel: RemindersViewModel) {
                 if (selectedHour < currentTime.get(Calendar.HOUR_OF_DAY) ||
                     (selectedHour == currentTime.get(Calendar.HOUR_OF_DAY) &&
                             selectedMinute < currentTime.get(Calendar.MINUTE))) {
-                    viewModel.subTaskTime = ""  // Просто очищаем поле времени
+                    viewModel.subTaskTime = ""
                 }
             }
 
@@ -223,6 +259,14 @@ fun SubTaskDatePicker(viewModel: RemindersViewModel) {
     )
 }
 
+/**
+ * Поле выбора времени для подзадачи.
+ *
+ * @param viewModel ViewModel для управления данными
+ *
+ * @author Яньшина А.Ю.
+ * @since 1.2.0
+ */
 @Composable
 fun SubTaskTimePicker(viewModel: RemindersViewModel) {
     val colors = LocalAppColors.current
@@ -294,6 +338,17 @@ fun SubTaskTimePicker(viewModel: RemindersViewModel) {
     )
 }
 
+/**
+ * Проверяет, можно ли установить указанное время для подзадачи.
+ *
+ * @param date Дата в формате dd.MM.yyyy
+ * @param hour Выбранный час
+ * @param minute Выбранная минута
+ * @return true, если время допустимо (не в прошлом)
+ *
+ * @author Грехов М.В. (адаптировано для подзадач)
+ * @since 1.2.1
+ */
 private fun isSubTaskTimeValid(date: String, hour: Int, minute: Int): Boolean {
     if (date.isEmpty()) return false
 
@@ -313,6 +368,15 @@ private fun isSubTaskTimeValid(date: String, hour: Int, minute: Int): Boolean {
     return true
 }
 
+/**
+ * Проверяет, является ли указанная дата сегодняшним днём для подзадачи.
+ *
+ * @param date Дата в формате dd.MM.yyyy
+ * @return true, если дата совпадает с сегодняшней
+ *
+ * @author Грехов М.В. (адаптировано для подзадач)
+ * @since 1.2.1
+ */
 private fun isSubTaskToday(date: String): Boolean {
     if (date.isEmpty()) return false
 
