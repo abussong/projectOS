@@ -70,4 +70,13 @@
     <string name="repeat_interval_minutes">Interval (min):</string>
     <string name="interval_hint">Minimum 1 minute, maximum 60 minutes</string>
     <string name="apply">Apply</string>
+
+    <!-- About section -->
+    <string name="about_section">About</string>
+    <string name="about_app">About App</string>
+    <string name="app_version">Version %s</string>
+    <string name="developers">Developers</string>
+    <string name="project_description">This application was created as an educational project. It is designed for managing reminders and tasks with the ability to create subtasks and configure notifications.</string>
+    <string name="thanks_message">Thank you for using our app! We hope it helps you stay organized and never forget anything.</string>
+    <string name="contacts">Contact us</string>
 </resources>

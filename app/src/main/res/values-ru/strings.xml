@@ -72,4 +72,13 @@
     <string name="repeat_interval_minutes">Интервал (мин):</string>
     <string name="interval_hint">Минимум 1 минута, максимум 60 минут</string>
     <string name="apply">Применить</string>
+
+    <!-- About section -->
+    <string name="about_section">О приложении</string>
+    <string name="about_app">О приложении</string>
+    <string name="app_version">Версия %s</string>
+    <string name="developers">Разработчики</string>
+    <string name="project_description">Данное приложение создано в качестве учебного проекта. Оно предназначено для управления напоминаниями и задачами с возможностью создания подзадач и настройки уведомлений.</string>
+    <string name="thanks_message">Благодарим вас за использование нашего приложения! Мы надеемся, что оно поможет вам оставаться организованными и ничего не забывать.</string>
+    <string name="contacts">Контакты для связи</string>
 </resources>
