@@ -11,9 +11,9 @@
  */
 
 plugins {
-
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+
     id("org.jetbrains.dokka") version "2.2.0"
 }
 
@@ -53,7 +53,23 @@ android {
     }
 }
 
+afterEvaluate {
+    tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
+        dokkaSourceSets {
+            configureEach {
+                // Явно указываем sourceSet от Android
+                sourceRoots.setFrom(
+                    android.sourceSets.getByName("main").java.srcDirs("src/main/kotlin"),
+                    "src/main/kotlin"
+                )
+            }
+        }
+    }
+}
 dependencies {
+    implementation("org.jetbrains.dokka:dokka-gradle-plugin:2.2.0")
+
+
     // ==================== ХРАНЕНИЕ НАСТРОЕК ====================
     // DataStore Preferences - для сохранения выбранной темы
     implementation("androidx.datastore:datastore-preferences:1.0.0")
@@ -88,7 +104,6 @@ dependencies {
 
     // ==================== ДРУГИЕ ЗАВИСИМОСТИ ====================
     implementation(libs.places)
-    implementation("org.jetbrains.dokka:dokka-gradle-plugin:2.2.0")
 
     // ==================== ТЕСТИРОВАНИЕ ====================
     testImplementation(libs.junit)
