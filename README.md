@@ -8,11 +8,8 @@
 
 ---
 ## 📚 О приложении
-
-Полная документация API доступна по ссылке: **[https://abussong.github.io/projectOS/](https://abussong.github.io/projectOS/)**
-
 <div align="center">
-  <img src="app/src/main/res/drawable/remindmind_icon2.png" width="120" alt="RemindMind mascot">
+  <img src="app/src/main/res/drawable/remindmind_icon2.png" width="800" alt="RemindMind mascot">
   <br>
 
 </div>
@@ -20,6 +17,9 @@
 <br>
 
 RemindMind создавался как учебный проект, но вырос в полноценное приложение для ежедневного использования. Мы старались сделать его удобным, гибким и приятным глазу.
+
+Полная документация API доступна по ссылке: **[https://abussong.github.io/projectOS/](https://abussong.github.io/projectOS/)**
+
 
 ---
 ## ✨ Возможности
