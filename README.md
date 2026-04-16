@@ -2,10 +2,12 @@
 
 **RemindMind** — это приложение для управления напоминаниями и задачами с поддержкой подзадач, приоритетов и кастомизируемых уведомлений.
 
-![Version](https://img.shields.io/badge/version-2.1.0-blue)
+![Version](https://img.shields.io/badge/version-2.1.1-blue)
 ![Android](https://img.shields.io/badge/Android-7.0%2B-green)
-![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-purple)
-
+![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-purple)
+![Compose](https://img.shields.io/badge/Jetpack%20Compose-2026.01.01-brightgreen)
+![AGP](https://img.shields.io/badge/AGP-9.0.1-orange)
+![License](https://img.shields.io/badge/License-Educational-lightgrey)
 ---
 ## 📚 О приложении
 <div align="center">

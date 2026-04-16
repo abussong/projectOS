@@ -28,7 +28,7 @@ android {
         minSdk = 24                  // Android 7.0 (минимальная версия)
         targetSdk = 36               // Android 15 (целевая версия)
         versionCode = 2
-        versionName = "2.1.0"          // Текущая версия приложения
+        versionName = "2.1.1"          // Текущая версия приложения
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
