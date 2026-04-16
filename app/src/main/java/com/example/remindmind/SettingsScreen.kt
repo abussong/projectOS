@@ -303,115 +303,144 @@ fun AboutScreen(
             )
         }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(colors.background)
-                .padding(paddingValues)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(paddingValues),
+            contentPadding = PaddingValues(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.remindmind_icon2),
-                contentDescription = "Cute cat",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(24.dp))
-            )
-
-            // Название приложения (осталось как было)
-            Text(
-                text = stringResource(id = R.string.app_title),
-                fontSize = 32.sp,
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.Thin,
-                color = colors.text
-            )
-
-            Text(
-                text = stringResource(id = R.string.app_version, "2.1.1"),
-                fontSize = 14.sp,
-                color = colors.textSecondary
-            )
-
-            Divider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                color = colors.border
-            )
-
-            // Информация о разработчиках
-            Text(
-                text = stringResource(id = R.string.developers),
-                fontSize = 18.sp,
-                color = colors.text,
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Грехов М.В.",
-                    fontSize = 16.sp,
-                    color = colors.text
+            // Картинка котика
+            item {
+                Image(
+                    painter = painterResource(id = R.drawable.remindmind_icon2),
+                    contentDescription = "Cute cat",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(24.dp))
                 )
+            }
+
+            // Название приложения
+            item {
                 Text(
-                    text = "Яньшина А.Ю.",
-                    fontSize = 16.sp,
+                    text = stringResource(id = R.string.app_title),
+                    fontSize = 32.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Thin,
                     color = colors.text
                 )
             }
 
-            Divider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                color = colors.border
-            )
+            // Версия
+            item {
+                Text(
+                    text = stringResource(id = R.string.app_version, "2.1.1"),
+                    fontSize = 14.sp,
+                    color = colors.textSecondary
+                )
+            }
+
+            // Разделитель
+            item {
+                Divider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = colors.border
+                )
+            }
+
+            // Информация о разработчиках
+            item {
+                Text(
+                    text = stringResource(id = R.string.developers),
+                    fontSize = 18.sp,
+                    color = colors.text,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Грехов М.В.",
+                        fontSize = 16.sp,
+                        color = colors.text
+                    )
+                    Text(
+                        text = "Яньшина А.Ю.",
+                        fontSize = 16.sp,
+                        color = colors.text
+                    )
+                }
+            }
+
+            // Разделитель
+            item {
+                Divider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = colors.border
+                )
+            }
 
             // Описание проекта
-            Text(
-                text = stringResource(id = R.string.project_description),
-                fontSize = 14.sp,
-                color = colors.text,
-                modifier = Modifier.fillMaxWidth()
-            )
+            item {
+                Text(
+                    text = stringResource(id = R.string.project_description),
+                    fontSize = 14.sp,
+                    color = colors.text,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-            Text(
-                text = stringResource(id = R.string.thanks_message),
-                fontSize = 14.sp,
-                color = colors.text,
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Благодарность
+            item {
+                Text(
+                    text = stringResource(id = R.string.thanks_message),
+                    fontSize = 14.sp,
+                    color = colors.text,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-            Divider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                color = colors.border
-            )
+            // Разделитель
+            item {
+                Divider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = colors.border
+                )
+            }
 
             // Контакты
-            Text(
-                text = stringResource(id = R.string.contacts),
-                fontSize = 18.sp,
-                color = colors.text,
-                style = MaterialTheme.typography.titleMedium
-            )
+            item {
+                Text(
+                    text = stringResource(id = R.string.contacts),
+                    fontSize = 18.sp,
+                    color = colors.text,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                ContactItem(
-                    email = "im.grexov.m@gmail.com",
-                    colors = colors
-                )
-                ContactItem(
-                    email = "nasyanshi@gmail.com",
-                    colors = colors
-                )
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ContactItem(
+                        email = "im.grexov.m@gmail.com",
+                        colors = colors
+                    )
+                    ContactItem(
+                        email = "nasyanshi@gmail.com",
+                        colors = colors
+                    )
+                }
             }
         }
     }
