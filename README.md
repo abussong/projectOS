@@ -7,7 +7,21 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-purple)
 
 ---
+## 📚 О приложении
 
+Полная документация API доступна по ссылке: **[https://abussong.github.io/projectOS/](https://abussong.github.io/projectOS/)**
+
+<div align="center">
+  <img src="app/src/main/res/drawable/remindmind_icon2.png" width="120" alt="RemindMind mascot">
+  <br>
+
+</div>
+
+<br>
+
+RemindMind создавался как учебный проект, но вырос в полноценное приложение для ежедневного использования. Мы старались сделать его удобным, гибким и приятным глазу.
+
+---
 ## ✨ Возможности
 
 ### 🎯 Основной функционал
@@ -44,5 +58,5 @@
 
 ### Из исходников
 ```bash
-git clone https://github.com/your-username/remindmind.git
-cd remindmind
+git clone https://github.com/abussong/projectOS.git
+cd projectOS
