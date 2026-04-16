@@ -11,8 +11,10 @@
  */
 
 plugins {
+
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.dokka") version "2.2.0"
 }
 
 android {
@@ -86,6 +88,7 @@ dependencies {
 
     // ==================== ДРУГИЕ ЗАВИСИМОСТИ ====================
     implementation(libs.places)
+    implementation("org.jetbrains.dokka:dokka-gradle-plugin:2.2.0")
 
     // ==================== ТЕСТИРОВАНИЕ ====================
     testImplementation(libs.junit)
