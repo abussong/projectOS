@@ -331,7 +331,7 @@ fun AboutScreen(
             )
 
             Text(
-                text = stringResource(id = R.string.app_version, "2.1.0"),
+                text = stringResource(id = R.string.app_version, "2.1.1"),
                 fontSize = 14.sp,
                 color = colors.textSecondary
             )
