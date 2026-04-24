@@ -321,7 +321,7 @@ fun EditReminderDialog(
                 onClick = { if (text.isNotBlank()) onSave(text) },
                 colors = ButtonDefaults.buttonColors(colors.secondary)
             ) {
-                Text(stringResource(R.string.save), color = Color.Black)
+                Text(stringResource(R.string.save), color = colors.cardBackground)
             }
         },
         dismissButton = {
