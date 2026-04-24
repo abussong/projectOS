@@ -46,6 +46,5 @@
 ```bash
 git clone https://github.com/your-username/remindmind.git
 cd remindmind
----
-### Ссылка на яндекс диск с Apk
+Ссылка на яндекс диск с Apk
 https://disk.yandex.ru/d/0RRIUWtmWj4v9Q
