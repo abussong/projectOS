@@ -62,3 +62,6 @@ RemindMind создавался как учебный проект, но выр�
 ```bash
 git clone https://github.com/abussong/projectOS.git
 cd projectOS
+Ссылка на яндекс диск с Apk
+https://disk.yandex.ru/d/0RRIUWtmWj4v9Q
+
