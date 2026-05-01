@@ -2,12 +2,28 @@
 
 **RemindMind** — это приложение для управления напоминаниями и задачами с поддержкой подзадач, приоритетов и кастомизируемых уведомлений.
 
-![Version](https://img.shields.io/badge/version-2.1.0-blue)
+![Version](https://img.shields.io/badge/version-2.1.1-blue)
 ![Android](https://img.shields.io/badge/Android-7.0%2B-green)
-![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-purple)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-purple)
+![Compose](https://img.shields.io/badge/Jetpack%20Compose-2026.01.01-brightgreen)
+![AGP](https://img.shields.io/badge/AGP-9.0.1-orange)
+![License](https://img.shields.io/badge/License-Educational-lightgrey)
+---
+## 📚 О приложении
+<div align="center">
+  <img src="app/src/main/res/drawable/remindmind_icon2.png" width="800" alt="RemindMind mascot">
+  <br>
+
+</div>
+
+<br>
+
+RemindMind создавался как учебный проект, но вырос в полноценное приложение для ежедневного использования. Мы старались сделать его удобным, гибким и приятным глазу.
+
+Полная документация API доступна по ссылке: **[https://abussong.github.io/projectOS/](https://abussong.github.io/projectOS/)**
+
 
 ---
-
 ## ✨ Возможности
 
 ### 🎯 Основной функционал
@@ -44,7 +60,8 @@
 
 ### Из исходников
 ```bash
-git clone https://github.com/your-username/remindmind.git
-cd remindmind
+git clone https://github.com/abussong/projectOS.git
+cd projectOS
 Ссылка на яндекс диск с Apk
 https://disk.yandex.ru/d/0RRIUWtmWj4v9Q
+
